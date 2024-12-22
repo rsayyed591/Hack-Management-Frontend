@@ -1,3 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@font-face {
+  font-family: 'TT Commons';
+  src: url('/fonts/TTCommons-DemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #191E29;
+  color: #FFFFFF;
+}
+
+.font-tt-commons {
+  font-family: 'TT Commons', sans-serif;
+}
+

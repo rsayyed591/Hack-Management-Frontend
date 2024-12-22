@@ -2,14 +2,14 @@ import { FileText } from 'lucide-react'
 
 export default function ProblemStatement() {
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-white">
-      <div className="max-w-4xl mx-auto border-2 border-black rounded-lg p-4 sm:p-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6 sm:mb-8 flex items-center font-orbitron">
-          <FileText className="mr-2 sm:mr-4 h-8 w-8 sm:h-10 sm:w-10" />
+    <div className="min-h-screen p-4 md:p-8 bg-[#191E29]">
+      <div className="max-w-4xl mx-auto border-2 border-[#01C38D] rounded-lg p-4 sm:p-8 bg-[#132D46]">
+        <h1 className="text-4xl font-bold text-white mb-8 flex items-center font-tt-commons">
+          <FileText className="mr-4 h-10 w-10 text-[#01C38D]" />
           Problem Statement
         </h1>
-        <div className="bg-gray-100 p-4 sm:p-8 rounded-lg border-2 border-black">
-          <p className="text-black font-poppins">
+        <div className="bg-[#191E29] p-4 sm:p-8 rounded-lg border-2 border-[#01C38D]">
+          <p className="text-[#696E79]">
             The problem statement for the hackathon will be displayed here. It will outline the challenge that participants need to address during the event.
           </p>
         </div>
