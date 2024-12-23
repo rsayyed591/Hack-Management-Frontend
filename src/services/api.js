@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000/api/v1/user',
+  baseURL: `${import.meta.env.VITE_API_BASE_URL}/api/v1/user`,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
@@ -45,9 +45,9 @@ export const participantService = {
   getParticipantInfoQR: async () => {
     try {
       const response = await api.get('/participantInfoQR')
-      return response.data
+      return response.data.message
     } catch (error) {
-      throw error.response?.data || error
+      throw error.response?.message || error
     }
   },
 

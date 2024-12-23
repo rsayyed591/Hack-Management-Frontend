@@ -1,20 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react' 
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function Login() {
+  const navigate = useNavigate()
+  const { user, login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const navigate = useNavigate()
-  const { login } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      navigate('/participant',{replace:true})  
+    }
+  }, [user, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     try {
       await login(email, password)
-      navigate('/participant')
+      navigate('/participant', { replace: true })
     } catch (error) {
       setError(error.message || 'Invalid email or password. Please try again.')
     }
@@ -65,4 +71,3 @@ export default function Login() {
     </div>
   )
 }
-

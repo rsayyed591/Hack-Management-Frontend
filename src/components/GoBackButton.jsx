@@ -16,7 +16,7 @@ export default function GoBackButton() {
   return (
     <button
       onClick={goBack}
-      className="absolute top-4 left-4 text-white hover:text-[#01C38D] transition-colors flex items-center text-sm sm:text-base"
+      className="text-white hover:text-[#01C38D] transition-colors flex items-center text-sm sm:text-base"
     >
       <ArrowLeft className="mr-1 h-4 w-4 sm:h-5 sm:w-5" />
       Go Back

@@ -1,19 +1,17 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Utensils } from 'lucide-react'
-import QRModal from './QRModal'
 import { authService } from '../../services/api'
 import { useAuth } from '../../contexts/AuthContext'
+import GoBackButton from '../../components/GoBackButton'
 
 export default function Food() {
   const [selectedMeal, setSelectedMeal] = useState(null)
-  const [qrCode, setQrCode] = useState(null)
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const meals = ['breakfast', 'lunch', 'snacks', 'dinner']
 
   const handleMealSelect = async (meal) => {
     try {
-      const response = await authService.getQRForFood(meal)
-      setQrCode(response.data)
+      await authService.getQRForFood(meal)
       setSelectedMeal(meal)
     } catch (error) {
       console.error('Error fetching QR code for food:', error)
@@ -25,7 +23,17 @@ export default function Food() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-[#191E29]">
+    <div className="min-h-screen p-4 md:p-8 bg-[#191E29] relative">
+      <div className="flex justify-between items-center mb-8">
+        <GoBackButton />
+        <button
+          onClick={logout}
+          className="text-white hover:text-[#01C38D] transition-colors"
+        >
+          Logout
+        </button>
+      </div>
+
       <div className="max-w-4xl mx-auto border-2 border-[#01C38D] rounded-lg p-4 sm:p-8 bg-[#132D46]">
         <h1 className="text-3xl sm:text-4xl font-bold text-white mb-6 sm:mb-8 flex items-center font-tt-commons">
           <Utensils className="mr-2 sm:mr-4 h-8 w-8 sm:h-10 sm:w-10 text-[#01C38D]" />
@@ -61,18 +69,23 @@ export default function Food() {
           ))}
         </div>
       </div>
-      {selectedMeal && qrCode && (
-        <QRModal 
-          isOpen={!!selectedMeal} 
-          onClose={() => setSelectedMeal(null)} 
-          title={`QR Code for ${selectedMeal}`}
-          qrValue={qrCode}
-          theme={{
-            bg: '#132D46',
-            border: '#01C38D',
-            text: '#FFFFFF'
-          }}
-        />
+      {selectedMeal && (
+        <div className="fixed inset-0 bg-[#191E29]/90 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#132D46] p-4 sm:p-8 rounded-lg max-w-sm w-full border-2 border-[#01C38D]">
+            <h2 className="text-xl sm:text-2xl font-bold text-white font-tt-commons mb-4">
+              QR Code for {selectedMeal}
+            </h2>
+            <div className="bg-white p-4 rounded-lg mb-4">
+              <p className="text-[#191E29] text-center">QR Code Placeholder</p>
+            </div>
+            <button
+              onClick={() => setSelectedMeal(null)}
+              className="w-full bg-[#01C38D] text-[#191E29] font-bold py-2 px-4 rounded hover:bg-[#01C38D]/90 transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   )
