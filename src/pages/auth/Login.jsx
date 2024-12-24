@@ -1,26 +1,41 @@
-import { useEffect, useState } from 'react' 
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { authService } from '../../services/api' // Import the authService
 
 export default function Login() {
-  const navigate = useNavigate()
-  const { user, login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (user) {
-      navigate('/participant',{replace:true})  
-    }
-  }, [user, navigate])
+  const navigate = useNavigate()
+  const { login } = useAuth()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
     try {
+      // Step 1: Perform login
       await login(email, password)
-      navigate('/participant', { replace: true })
+
+      // Step 2: Fetch user info
+      const response = await authService.getInfo()
+
+      // Step 3: Navigate based on role
+      const role = response?.message?.role
+
+      switch (role) {
+        case 'superAdmin':
+          navigate('/superadmin')
+          break
+        case 'admin':
+          navigate('/admin')
+          break
+        case 'judge':
+          navigate('/judge')
+          break
+        default:
+          navigate('/participant')
+      }
     } catch (error) {
       setError(error.message || 'Invalid email or password. Please try again.')
     }

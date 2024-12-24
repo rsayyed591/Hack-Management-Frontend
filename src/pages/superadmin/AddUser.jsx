@@ -1,0 +1,104 @@
+import { useState } from 'react'
+import { UserPlus } from 'lucide-react'
+import { superAdminService } from '../../services/api'
+
+export default function AddUser() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'participant',
+  })
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    try {
+      await superAdminService.addUser(formData)
+      setSuccess('User added successfully')
+      setFormData({ name: '', email: '', password: '', role: 'participant' })
+    } catch (err) {
+      setError(err.message || 'Failed to add user')
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2">
+        <UserPlus className="h-6 w-6 text-[#01C38D]" />
+        <h1 className="text-2xl font-bold text-white">Add User</h1>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-white">Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+                        className="mt-1 block w-full rounded-md bg-[#132D46] border-[#01C38D] text-white shadow-sm focus:border-[#01C38D] focus:ring focus:ring-[#01C38D] focus:ring-opacity-50 px-4 py-2"
+
+          />
+        </div>
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-white">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+                        className="mt-1 block w-full rounded-md bg-[#132D46] border-[#01C38D] text-white shadow-sm focus:border-[#01C38D] focus:ring focus:ring-[#01C38D] focus:ring-opacity-50 px-4 py-2"
+
+          />
+        </div>
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-white">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+                        className="mt-1 block w-full rounded-md bg-[#132D46] border-[#01C38D] text-white shadow-sm focus:border-[#01C38D] focus:ring focus:ring-[#01C38D] focus:ring-opacity-50 px-4 py-2"
+
+          />
+        </div>
+        <div>
+          <label htmlFor="role" className="block text-sm font-medium text-white">Role</label>
+          <select
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+                        className="mt-1 block w-full rounded-md bg-[#132D46] border-[#01C38D] text-white shadow-sm focus:border-[#01C38D] focus:ring focus:ring-[#01C38D] focus:ring-opacity-50 px-4 py-2"
+
+          >
+            <option value="participant">Participant</option>
+            <option value="judge">Judge</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <button
+          type="submit"
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#191E29] bg-[#01C38D] hover:bg-[#01C38D]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01C38D]"
+        >
+          Add User
+        </button>
+      </form>
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
+    </div>
+  )
+}

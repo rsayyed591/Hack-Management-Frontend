@@ -16,7 +16,6 @@ export function AuthProvider({ children }) {
   const checkAuth = async () => {
     try {
       const response = await authService.getInfo() 
-      // console.log(response)
       if (response) {
         setUser(response)
       } else {
@@ -58,3 +57,4 @@ export function AuthProvider({ children }) {
 }
 
 export const useAuth = () => useContext(AuthContext)
+
