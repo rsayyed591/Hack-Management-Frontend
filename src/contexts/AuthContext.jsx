@@ -43,6 +43,7 @@ export function AuthProvider({ children }) {
     try {
       await authService.logout()
       setUser(null)
+      localStorage.removeItem('token')
       navigate('/')
     } catch (error) {
       console.error('Logout failed:', error)

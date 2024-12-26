@@ -8,11 +8,23 @@ const api = axios.create({
   }
 })
 
+const token = localStorage.getItem('token')
+if (token) {
+  api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+}
 
 export const authService = {
   login: async (email, password) => {
     try {
       const response = await api.post('/user/login', { email, password })
+
+      // Save the token in localStorage
+      const token = response.data.message.token
+      localStorage.setItem('token', token)
+
+      // Set Authorization header for subsequent requests
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
       return response.data
     } catch (error) {
       throw error.response?.data || error
@@ -22,6 +34,10 @@ export const authService = {
   logout: async () => {
     try {
       const response = await api.get('/user/logout')
+      // Clear token from localStorage and headers
+      localStorage.removeItem('token')
+      delete api.defaults.headers.common['Authorization']
+
       return response.data
     } catch (error) {
       throw error.response?.data || error
@@ -40,6 +56,7 @@ export const authService = {
     }
   }
 }
+
 
 export const participantService = {
   getParticipantInfoQR: async () => {
