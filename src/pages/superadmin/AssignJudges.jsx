@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { UserCog } from 'lucide-react'
 import { superAdminService } from '../../services/api'
 import Loader from '../../components/Loader'
-import Autocomplete from '../../components/Autocomplete'
+import AutoComplete from '../../components/AutoComplete'
 
 export default function AssignJudges() {
   const [judges, setJudges] = useState([])
@@ -77,7 +77,7 @@ export default function AssignJudges() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="judge" className="block text-sm font-medium text-white">Select Judge</label>
-          <Autocomplete
+          <AutoComplete
             options={judges.map(judge => ({ label: `${judge.name} (${judge.email})`, value: judge._id }))}
             onSelect={handleJudgeSelect}
             placeholder="Search for a judge"
@@ -85,7 +85,7 @@ export default function AssignJudges() {
         </div>
         <div>
           <label className="block text-sm font-medium text-white">Select Teams</label>
-          <Autocomplete
+          <AutoComplete
             options={teams.map(team => ({ label: team.teamName, value: team._id }))}
             onSelect={handleTeamSelect}
             placeholder="Search for teams"

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Users } from 'lucide-react'
 import { superAdminService } from '../../services/api'
 import Loader from '../../components/Loader'
-import Autocomplete from '../../components/Autocomplete'
+import AutoComplete from '../../components/AutoComplete'
 
 export default function AddTeam() {
   const [formData, setFormData] = useState({
@@ -126,7 +126,7 @@ export default function AddTeam() {
     <label htmlFor="teamLead" className="block text-sm font-medium text-white">
       Team Lead <span className="text-red-500">*</span>
     </label>
-    <Autocomplete
+    <AutoComplete
       options={participants.map(p => ({ label: `${p.name} (${p.email})`, value: p._id }))}
       onSelect={(option) => setFormData({ ...formData, teamLead: option.value })}
       placeholder="Search for team lead"
@@ -137,7 +137,7 @@ export default function AddTeam() {
       <label htmlFor={`member${index + 1}`} className="block text-sm font-medium text-white">
         Team Member {index + 1}
       </label>
-      <Autocomplete
+      <AutoComplete
         options={participants.map(p => ({ label: `${p.name} (${p.email})`, value: p._id }))}
         onSelect={(option) => {
           const newMembers = [...formData.teamMembers]

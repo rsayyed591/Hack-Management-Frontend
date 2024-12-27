@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 
-export default function Autocomplete({ options, onSelect, placeholder, initialValue = '' }) {
+export default function AutoComplete({ options, onSelect, placeholder, initialValue = '' }) {
   const [inputValue, setInputValue] = useState(initialValue)
   const [filteredOptions, setFilteredOptions] = useState([])
   const [isOpen, setIsOpen] = useState(false)
@@ -61,4 +61,3 @@ export default function Autocomplete({ options, onSelect, placeholder, initialVa
     </div>
   )
 }
-
