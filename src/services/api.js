@@ -186,3 +186,139 @@ export const superAdminService = {
   },
 }
 
+export const adminService = {
+  // Get dashboard stats
+  getDashboardStats: async () => {
+    try {
+      const [participantsResponse, teamsResponse, checkedInResponse] = await Promise.all([
+        api.get('/admin/getParticipants'),
+        api.get('/admin/getTeams'),
+        api.get('/admin/getCheckedInUsers')
+      ])
+
+      return {
+        totalParticipants: participantsResponse.data.data.length,
+        totalTeams: teamsResponse.data.data.length,
+        totalCheckedIn: checkedInResponse.data.data.length
+      }
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Add new user
+  addUser: async (userData) => {
+    try {
+      const response = await api.post('/admin/addUser', userData)
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Bulk add users
+  bulkAddUser: async (formData) => {
+    try {
+      const response = await api.post('/admin/bulkAddUser', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Add new team
+  addTeam: async (teamData) => {
+    try {
+      const response = await api.post('/admin/addTeam', teamData)
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Get all teams
+  getTeams: async () => {
+    try {
+      const response = await api.get('/admin/getTeams')
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Get all participants
+  getParticipants: async () => {
+    try {
+      const response = await api.get('/admin/getParticipants')
+      console.log(response.data)
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Check in by email
+  checkInByEmail: async (email) => {
+    try {
+      const response = await api.post('/admin/checkIn', { email })
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Check in by QR
+  checkInByQR: async (qrData) => {
+    try {
+      const response = await api.post('/admin/checkInByQr', { qrData })
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Bulk check in
+  bulkCheckIn: async (ids) => {
+    try {
+      const response = await api.post('/admin/bulkCheckIn', { ids })
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Get checked in users
+  getCheckedInUsers: async () => {
+    try {
+      const response = await api.get('/admin/getCheckedInUsers')
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Food QR
+  foodQR: async (qrData) => {
+    try {
+      const response = await api.post('/admin/foodQr', { qrData })
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Add problem statement
+  addPS: async (psData) => {
+    try {
+      const response = await api.post('/admin/addPS', psData)
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  }
+}
+

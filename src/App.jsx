@@ -24,6 +24,20 @@ import LeaderBoard from './pages/superadmin/LeaderBoard'
 import Loader from './components/Loader'
 import AssignedJudges from './pages/superadmin/AssignedJudges'
 
+// Admin Routes
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminDashboardHome from './pages/admin/Dashboard'
+import AdminAddUser from './pages/admin/AddUser'
+import AdminBulkAddUser from './pages/admin/AddBulkUser'
+import AdminAddTeam from './pages/admin/AddTeam'
+import AdminParticipants from './pages/admin/Participants'
+import AdminTeams from './pages/admin/Teams'
+import AdminCheckIn from './pages/admin/CheckIn'
+import AdminCheckInQR from './pages/admin/CheckInQR'
+import AdminCheckedInUsers from './pages/admin/CheckedInUsers'
+import AdminAddPS from './pages/admin/AddPS'
+import AdminFoodQR from './pages/admin/FoodQR'
+
 const SuperAdminRoute = ({ children }) => {
   const { user, loading } = useAuth()
   
@@ -32,6 +46,20 @@ const SuperAdminRoute = ({ children }) => {
   }
 
   if (!user || user?.message?.role !== 'superAdmin') {
+    return <Navigate to="/login" replace />
+  }
+  
+  return children
+}
+
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth()
+  
+  if (loading) {
+    return <Loader />
+  }
+
+  if (!user || user?.message?.role !== 'admin') {
     return <Navigate to="/login" replace />
   }
   
@@ -113,6 +141,28 @@ export default function App() {
             <Route path="assign-judges" element={<AssignJudges />} />
             <Route path="assigned-judges" element={<AssignedJudges />} />
             <Route path="leaderboard" element={<LeaderBoard />} />
+          </Route>
+
+          {/* Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          >
+            <Route index element={<AdminDashboardHome />} />
+            <Route path="add-user" element={<AdminAddUser />} />
+            <Route path="bulk-add-user" element={<AdminBulkAddUser />} />
+            <Route path="add-team" element={<AdminAddTeam />} />
+            <Route path="participants" element={<AdminParticipants />} />
+            <Route path="teams" element={<AdminTeams />} />
+            <Route path="check-in" element={<AdminCheckIn />} />
+            <Route path="check-in-qr" element={<AdminCheckInQR />} />
+            <Route path="checked-in-users" element={<AdminCheckedInUsers />} />
+            <Route path="add-ps" element={<AdminAddPS />} />
+            <Route path="food-qr" element={<AdminFoodQR />} />
           </Route>
         </Routes>
       </AuthProvider>
