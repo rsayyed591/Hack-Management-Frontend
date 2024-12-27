@@ -156,6 +156,33 @@ export const superAdminService = {
     } catch (error) {
       throw error.response?.data || error
     }
-  }
+  },
+
+  getJudges: async () => {
+    try {
+      const response = await api.get('/superAdmin/getJudges')
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  getParticipantsNotInTeam: async () => {
+    try {
+      const response = await api.get('/superAdmin/getParticipantsNotTeam')
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  getAssignedJudges: async () => {
+    try {
+      const response = await api.get('/superAdmin/getAssignedJudges')
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
 }
 

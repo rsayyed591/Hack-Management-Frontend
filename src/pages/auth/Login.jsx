@@ -1,18 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { authService } from '../../services/api' // Import the authService
+import { authService } from '../../services/api'
+import Loader from '../../components/Loader' // Import Loader component
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false) // Add loading state
   const navigate = useNavigate()
   const { login } = useAuth()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setLoading(true) // Show Loader
+
     try {
       // Step 1: Perform login
       await login(email, password)
@@ -38,7 +42,13 @@ export default function Login() {
       }
     } catch (error) {
       setError(error.message || 'Invalid email or password. Please try again.')
+    } finally {
+      setLoading(false) // Hide Loader after process completes
     }
+  }
+
+  if (loading) {
+    return <Loader /> // Show Loader when loading
   }
 
   return (

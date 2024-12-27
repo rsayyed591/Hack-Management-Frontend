@@ -40,6 +40,11 @@ export default function SuperAdminDashboard() {
       path: '/superadmin/assign-judges' 
     },
     { 
+      title: 'Judges', 
+      icon: UserCog, 
+      path: '/superadmin/assigned-judges' 
+    },
+    { 
       title: 'Leaderboard', 
       icon: Trophy, 
       path: '/superadmin/leaderboard' 

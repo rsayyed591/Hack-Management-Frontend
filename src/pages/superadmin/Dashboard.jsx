@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Users, Trophy } from 'lucide-react'
 import { superAdminService } from '../../services/api'
+import Loader from '../../components/Loader'
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -13,6 +14,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
+      setLoading(true)
       try {
         const data = await superAdminService.getDashboardStats()
         setStats({
@@ -36,11 +38,9 @@ export default function Dashboard() {
   }, [])
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[200px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#01C38D]"></div>
+        return <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
+        <Loader />
       </div>
-    )
   }
 
   if (error) {

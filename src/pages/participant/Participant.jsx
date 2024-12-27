@@ -2,12 +2,13 @@ import { Link } from 'react-router-dom'
 import { QrCode, Utensils, FileText, Award, Image } from 'lucide-react'
 import GoBackButton from '../../components/GoBackButton'
 import { useAuth } from '../../contexts/AuthContext'
+import Loader from '../../components/Loader'
 
 export default function Participant() {
   const { user, logout, loading } = useAuth()
 
   if (loading) {
-    return <div>Loading...</div> 
+    return <Loader /> 
   }
 
   if (!user) {

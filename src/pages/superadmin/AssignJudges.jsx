@@ -1,32 +1,49 @@
 import { useState, useEffect } from 'react'
 import { UserCog } from 'lucide-react'
 import { superAdminService } from '../../services/api'
+import Loader from '../../components/Loader'
+import Autocomplete from '../../components/Autocomplete'
 
 export default function AssignJudges() {
   const [judges, setJudges] = useState([])
   const [teams, setTeams] = useState([])
-  const [assignments, setAssignments] = useState({})
+  const [selectedJudge, setSelectedJudge] = useState('')
+  const [selectedTeams, setSelectedTeams] = useState([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true)
       try {
         const [judgesData, teamsData] = await Promise.all([
-          superAdminService.getParticipants(),
+          superAdminService.getJudges(),
           superAdminService.getTeams()
         ])
-        setJudges(judgesData.data.filter(user => user.role === 'judge'))
+        setJudges(judgesData.data)
         setTeams(teamsData.data)
       } catch (err) {
         setError('Failed to fetch data')
+      } finally {
+        setLoading(false)
       }
     }
     fetchData()
   }, [])
 
-  const handleAssignment = (teamId, judgeId) => {
-    setAssignments({ ...assignments, [teamId]: judgeId })
+  const handleJudgeSelect = (option) => {
+    setSelectedJudge(option.value)
+  }
+
+  const handleTeamSelect = (option) => {
+    setSelectedTeams(prev => {
+      if (prev.some(team => team.value === option.value)) {
+        return prev.filter(team => team.value !== option.value)
+      } else {
+        return [...prev, option]
+      }
+    })
   }
 
   const handleSubmit = async (e) => {
@@ -34,11 +51,21 @@ export default function AssignJudges() {
     setError('')
     setSuccess('')
     try {
-      await superAdminService.assignTeamsJudge(assignments)
-      setSuccess('Judges assigned successfully')
+      await Promise.all(selectedTeams.map(team => 
+        superAdminService.assignTeamsJudge({ judgeId: selectedJudge, teamId: team.value })
+      ))
+      setSuccess('Teams assigned successfully')
+      setSelectedJudge('')
+      setSelectedTeams([])
     } catch (err) {
-      setError(err.message || 'Failed to assign judges')
+      setError(err.message || 'Failed to assign teams')
     }
+  }
+
+  if (loading) {
+    return <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
+      <Loader />
+    </div>
   }
 
   return (
@@ -48,40 +75,45 @@ export default function AssignJudges() {
         <h1 className="text-2xl font-bold text-white">Assign Judges</h1>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-[#01C38D]">
-            <thead className="bg-[#132D46]">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Team</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Assign Judge</th>
-              </tr>
-            </thead>
-            <tbody className="bg-[#191E29] divide-y divide-[#01C38D]">
-              {teams.map((team) => (
-                <tr key={team._id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{team.teamName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <select
-                      value={assignments[team._id] || ''}
-                      onChange={(e) => handleAssignment(team._id, e.target.value)}
-                      className="mt-1 block w-full rounded-md bg-[#132D46] border-[#01C38D] text-white shadow-sm focus:border-[#01C38D] focus:ring focus:ring-[#01C38D] focus:ring-opacity-50"
-                    >
-                      <option value="">Select a judge</option>
-                      {judges.map((judge) => (
-                        <option key={judge._id} value={judge._id}>{judge.name}</option>
-                      ))}
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div>
+          <label htmlFor="judge" className="block text-sm font-medium text-white">Select Judge</label>
+          <Autocomplete
+            options={judges.map(judge => ({ label: `${judge.name} (${judge.email})`, value: judge._id }))}
+            onSelect={handleJudgeSelect}
+            placeholder="Search for a judge"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white">Select Teams</label>
+          <Autocomplete
+            options={teams.map(team => ({ label: team.teamName, value: team._id }))}
+            onSelect={handleTeamSelect}
+            placeholder="Search for teams"
+          />
+        </div>
+        <div className="mt-2">
+          <h3 className="text-sm font-medium text-white mb-2">Selected Teams:</h3>
+          <ul className="space-y-1">
+            {selectedTeams.map(team => (
+              <li key={team.value} className="flex items-center">
+                <span className="text-white">{team.label}</span>
+                <button
+                  type="button"
+                  onClick={() => handleTeamSelect(team)}
+                  className="ml-2 text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
         <button
           type="submit"
-          className="w-full sm:w-auto flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#191E29] bg-[#01C38D] hover:bg-[#01C38D]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01C38D]"
+          disabled={!selectedJudge || selectedTeams.length === 0}
+          className="w-full sm:w-auto flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#191E29] bg-[#01C38D] hover:bg-[#01C38D]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01C38D] disabled:opacity-50"
         >
-          Assign Judges
+          Assign Teams
         </button>
       </form>
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { UserPlus } from 'lucide-react'
 import { superAdminService } from '../../services/api'
+import Loader from '../../components/Loader'
 
 export default function AddUser() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ export default function AddUser() {
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -20,12 +22,15 @@ export default function AddUser() {
     e.preventDefault()
     setError('')
     setSuccess('')
+    setLoading(true)
     try {
       await superAdminService.addUser(formData)
       setSuccess('User added successfully')
       setFormData({ name: '', email: '', password: '', role: 'participant' })
     } catch (err) {
       setError(err.message || 'Failed to add user')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -35,6 +40,14 @@ export default function AddUser() {
         <UserPlus className="h-6 w-6 text-[#01C38D]" />
         <h1 className="text-2xl font-bold text-white">Add User</h1>
       </div>
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
+
+        {loading ? (
+          <div className="flex justify-center items-center lg:h-[70vh] py-4">
+            <Loader />
+          </div>
+        ) : (
       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-white">Name</label>
@@ -92,13 +105,13 @@ export default function AddUser() {
         </div>
         <button
           type="submit"
+          disabled={loading}
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#191E29] bg-[#01C38D] hover:bg-[#01C38D]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01C38D]"
         >
           Add User
         </button>
-      </form>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-      {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
-    </div>
+        </form>
+        )}
+      </div>
   )
 }

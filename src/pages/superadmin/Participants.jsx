@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ClipboardList } from 'lucide-react'
 import { superAdminService } from '../../services/api'
+import Loader from '../../components/Loader'
 
 export default function Participants() {
   const [participants, setParticipants] = useState([])
@@ -10,6 +11,7 @@ export default function Participants() {
   // Fetch participants
   useEffect(() => {
     const fetchParticipants = async () => {
+      setLoading(true)
       try {
         const response = await superAdminService.getParticipants()
         setParticipants(response.data || []) // Adjusted response handling
@@ -28,7 +30,9 @@ export default function Participants() {
 
   // Loading state
   if (loading) {
-    return <div className="text-white">Loading participants...</div>
+        return <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
+        <Loader />
+      </div>
   }
 
   // Error state

@@ -21,12 +21,14 @@ import Participants from './pages/superadmin/Participants'
 import Teams from './pages/superadmin/Teams'
 import AssignJudges from './pages/superadmin/AssignJudges'
 import LeaderBoard from './pages/superadmin/LeaderBoard'
+import Loader from './components/Loader'
+import AssignedJudges from './pages/superadmin/AssignedJudges'
 
 const SuperAdminRoute = ({ children }) => {
   const { user, loading } = useAuth()
   
   if (loading) {
-    return <div>Loading...</div>
+    return <Loader />
   }
 
   if (!user || user?.message?.role !== 'superAdmin') {
@@ -109,6 +111,7 @@ export default function App() {
             <Route path="participants" element={<Participants />} />
             <Route path="teams" element={<Teams />} />
             <Route path="assign-judges" element={<AssignJudges />} />
+            <Route path="assigned-judges" element={<AssignedJudges />} />
             <Route path="leaderboard" element={<LeaderBoard />} />
           </Route>
         </Routes>

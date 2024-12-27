@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Users } from 'lucide-react'
 import { superAdminService } from '../../services/api'
+import Loader from '../../components/Loader'
 
 export default function Teams() {
   const [teams, setTeams] = useState([])
@@ -10,6 +11,7 @@ export default function Teams() {
   // Fetch teams
   useEffect(() => {
     const fetchTeams = async () => {
+      setLoading(true)
       try {
         const response = await superAdminService.getTeams()
         setTeams(response.data || []) // Use the actual data
@@ -24,8 +26,10 @@ export default function Teams() {
 
   // Loading state
   if (loading) {
-    return <div className="text-white">Loading teams...</div>
-  }
+        return <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
+        <Loader />
+      </div>
+  } 
 
   // Error state
   if (error) {
