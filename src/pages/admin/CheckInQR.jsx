@@ -1,67 +1,74 @@
-import React, { useEffect, useRef } from 'react';
-
+import React, { useState } from 'react';
+import { QrCode } from 'lucide-react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
+import { adminService } from '../../services/api';
+import Loader from '../../components/Loader';
 
-const QRScanner = () => {
-  const scannerRef = useRef(null);
-
-  useEffect(() => {
-    const scanner = new Html5QrcodeScanner(
-      'reader', // ID of the div where the scanner will render
-      {
-        fps: 10, // Frames per second
-        qrbox: { width: 250, height: 250 }, // Scanner box dimensions
-      },
-      false // verbose mode
-    );
-
-    scanner.render(
-      (decodedText) => {
-        handleScanSuccess(decodedText);
-      },
-      (error) => {
-        console.error('QR Code scan error:', error);
-      }
-    );
-
-    // Cleanup function to clear the scanner on component unmount
-    return () => {
-      if (scanner) {
-        scanner.clear().catch((err) => {
-          console.error('Error clearing scanner:', err);
-        });
-      }
-    };
-  }, []);
+const CheckInQR = () => {
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
 
   const handleScanSuccess = async (decodedText) => {
-    console.log('Decoded text:', decodedText);
-    try {
-      // Send the decoded text to the backend for validation
-      const response = await fetch('https://hackathon-eight-roan.vercel.app/api/v1/admin/checkInByQr', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ qrData: decodedText }),
-      });
+    setLoading(true);
+    setError('');
+    setSuccess('');
 
-      const data = await response.json();
-      if (response.ok) {
-        alert(data.message); // Display success message
-      } else {
-        alert(`Error: ${data.message}`); // Display error message from backend
-      }
-    } catch (error) {
-      console.error('Error sending data to backend:', error);
+    console.log('Decoded text:', decodedText);
+
+    try {
+      const response = await adminService.checkInByQR(decodedText);
+      setSuccess(response.message || 'Participant checked in successfully!');
+    } catch (err) {
+      setError(err.message || 'Failed to check in participant');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleScanError = (error) => {
+    console.error('QR Code scan error:', error);
+    setError('Error scanning QR code. Please try again.');
+  };
+
+  const startScanner = () => {
+    const scanner = new Html5QrcodeScanner('reader', {
+      fps: 10,
+      qrbox: { width: 250, height: 250 },
+    });
+
+    scanner.render(handleScanSuccess, handleScanError);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
+        <Loader />
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <div id="reader" style={{ width: '100%' }}></div>
+    <div className="space-y-6">
+      <div className="flex items-center space-x-2">
+        <QrCode className="h-6 w-6 text-[#01C38D]" />
+        <h1 className="text-2xl font-bold text-white">Check In by QR</h1>
+      </div>
+      <div className="border border-[#01C38D] rounded-lg p-4 sm:p-8 bg-[#132D46]">
+        <div id="reader" style={{ width: '100%' }} />
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={startScanner}
+            className="px-4 py-2 rounded-md text-white font-medium bg-[#01C38D] hover:bg-[#01C38D]/90"
+          >
+            Start Scanning
+          </button>
+        </div>
+      </div>
+      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
     </div>
   );
 };
 
-export default QRScanner;
+export default CheckInQR;
