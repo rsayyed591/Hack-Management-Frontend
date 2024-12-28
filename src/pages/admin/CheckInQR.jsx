@@ -1,91 +1,100 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { QrCode } from 'lucide-react'
+import { QrCode } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { adminService } from '../../services/api';
 import Loader from '../../components/Loader';
 
 const CheckInQR = () => {
-  const scannerRef = useRef(null);
+  const scannerRef = useRef(null); // To preserve scanner instance
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [isScanning, setIsScanning] = useState(false);
+  const [processing, setProcessing] = useState(false); // To prevent repeated processing
 
   useEffect(() => {
-    // Initialize scanner only once
-    scannerRef.current = new Html5Qrcode('reader');
-
-    // Cleanup function to stop the scanner when the component unmounts
+    scannerRef.current = new Html5Qrcode('reader'); // Initialize scanner
+  
     return () => {
-      stopScanner();
+      // Cleanup only if scanner is active
+      if (scannerRef.current && scannerRef.current.getState() === 2) { // Check if scanner is RUNNING
+        scannerRef.current.stop()
+          .then(() => scannerRef.current.clear())
+          .catch((err) => console.error('Error stopping scanner during cleanup:', err));
+      }
     };
   }, []);
+  
 
+  // Handle QR Code Scanning Success
   const handleScanSuccess = async (decodedText) => {
-    if (isScanning) {
-      // Prevent multiple scans from triggering the function
-      setIsScanning(false);
+    if (processing) return; // Ignore if already processing
+    setProcessing(true); // Lock further scans until processing is complete
 
-      console.log('Decoded text:', decodedText);
-      setLoading(true);
-      setError('');
-      setSuccess('');
-
-      try {
-        const response = await adminService.checkInByQR(decodedText);
-        setSuccess(response.message || 'Participant checked in successfully!');
-        // Restart scanner after successful check-in
-        startScanner();
-      } catch (error) {
-        setError(error.message || 'Failed to check in participant');
-        // Restart scanner after failed check-in
-        startScanner();
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
-
-  const handleScanError = (error) => {
-    console.error('QR Code scan error:', error);
-    setError('Error scanning QR code.');
-    // Restart the scanner after an error
-    startScanner();
-  };
-
-  const startScanner = async () => {
+    console.log('Decoded text:', decodedText);
+    setLoading(true); // Show loader
     setError('');
     setSuccess('');
 
-    if (!isScanning && scannerRef.current) {
-      try {
-        await scannerRef.current.start(
-          { facingMode: "environment" },
-          { fps: 10, qrbox: { width: 250, height: 250 } },
-          handleScanSuccess,
-          handleScanError
-        );
-        setIsScanning(true);
-      } catch (err) {
-        console.error("Error starting scanner:", err);
-        setError("Could not start scanner. Please try again.");
-      }
+    try {
+      // Simulate backend API call
+      const response = await adminService.checkInByQR(decodedText);
+      setSuccess(response.message || 'Participant checked in successfully!');
+    } catch (error) {
+      setError(error.message || 'Failed to check in participant');
+    } finally {
+      setLoading(false);
+      setProcessing(false); // Unlock scanning for the next QR code
     }
   };
 
+  // Handle QR Code Scan Errors
+  const handleScanError = (error) => {
+    console.error('QR Code scan error:', error);
+    if (!processing) {
+      setError('Error scanning QR code. Please try again.');
+    }
+  };
+
+  // Start Scanner
+  const startScanner = async () => {
+    if (isScanning || !scannerRef.current) return; // Prevent multiple starts
+
+    setError('');
+    setSuccess('');
+    try {
+      await scannerRef.current.start(
+        { facingMode: "environment" }, // Use rear camera
+        { fps: 10, qrbox: { width: 250, height: 250 } }, // Settings
+        handleScanSuccess,
+        handleScanError
+      );
+      setIsScanning(true); // Set scanning state
+    } catch (err) {
+      console.error('Error starting scanner:', err);
+      setError('Could not start scanner. Please try again.');
+    }
+  };
+
+  // Stop Scanner
   const stopScanner = async () => {
-    if (isScanning && scannerRef.current) {
-      try {
+    if (!isScanning || !scannerRef.current) return;
+  
+    try {
+      const state = scannerRef.current.getState(); // Check scanner state
+      if (state === 2) { // Only stop if scanner is RUNNING
         await scannerRef.current.stop();
-        scannerRef.current.clear(); // Clear the scanner
+        scannerRef.current.clear();
         setIsScanning(false);
-      } catch (err) {
-        console.error("Error stopping scanner:", err);
-        setError("Could not stop scanner. Please try again.");
       }
+    } catch (err) {
+      console.error("Error stopping scanner:", err);
+      setError("Could not stop scanner. Please try again.");
     }
   };
+  
 
+  // Toggle Start/Stop Scanner
   const handleStartStop = () => {
     if (isScanning) {
       stopScanner();
@@ -94,6 +103,7 @@ const CheckInQR = () => {
     }
   };
 
+  // Show loader while processing
   if (loading) {
     return <Loader />;
   }
@@ -125,4 +135,3 @@ const CheckInQR = () => {
 };
 
 export default CheckInQR;
-
