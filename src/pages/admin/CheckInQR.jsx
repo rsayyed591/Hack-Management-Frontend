@@ -1,137 +1,67 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { QrCode } from 'lucide-react';
-import { Html5Qrcode } from 'html5-qrcode';
-import { adminService } from '../../services/api';
-import Loader from '../../components/Loader';
+import React, { useEffect, useRef } from 'react';
 
-const CheckInQR = () => {
-  const scannerRef = useRef(null); // To preserve scanner instance
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
-  const [isScanning, setIsScanning] = useState(false);
-  const [processing, setProcessing] = useState(false); // To prevent repeated processing
+import { Html5QrcodeScanner } from 'html5-qrcode';
+
+const QRScanner = () => {
+  const scannerRef = useRef(null);
 
   useEffect(() => {
-    scannerRef.current = new Html5Qrcode('reader'); // Initialize scanner
-  
+    const scanner = new Html5QrcodeScanner(
+      'reader', // ID of the div where the scanner will render
+      {
+        fps: 10, // Frames per second
+        qrbox: { width: 250, height: 250 }, // Scanner box dimensions
+      },
+      false // verbose mode
+    );
+
+    scanner.render(
+      (decodedText) => {
+        handleScanSuccess(decodedText);
+      },
+      (error) => {
+        console.error('QR Code scan error:', error);
+      }
+    );
+
+    // Cleanup function to clear the scanner on component unmount
     return () => {
-      // Cleanup only if scanner is active
-      if (scannerRef.current && scannerRef.current.getState() === 2) { // Check if scanner is RUNNING
-        scannerRef.current.stop()
-          .then(() => scannerRef.current.clear())
-          .catch((err) => console.error('Error stopping scanner during cleanup:', err));
+      if (scanner) {
+        scanner.clear().catch((err) => {
+          console.error('Error clearing scanner:', err);
+        });
       }
     };
   }, []);
-  
 
-  // Handle QR Code Scanning Success
   const handleScanSuccess = async (decodedText) => {
-    if (processing) return; // Ignore if already processing
-    setProcessing(true); // Lock further scans until processing is complete
-
     console.log('Decoded text:', decodedText);
-    setLoading(true); // Show loader
-    setError('');
-    setSuccess('');
-
     try {
-      // Simulate backend API call
-      const response = await adminService.checkInByQR(decodedText);
-      setSuccess(response.message || 'Participant checked in successfully!');
-    } catch (error) {
-      setError(error.message || 'Failed to check in participant');
-    } finally {
-      setLoading(false);
-      setProcessing(false); // Unlock scanning for the next QR code
-    }
-  };
+      // Send the decoded text to the backend for validation
+      const response = await fetch('https://hackathon-eight-roan.vercel.app/api/v1/admin/checkInByQr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ qrData: decodedText }),
+      });
 
-  // Handle QR Code Scan Errors
-  const handleScanError = (error) => {
-    console.error('QR Code scan error:', error);
-    if (!processing) {
-      setError('Error scanning QR code. Please try again.');
-    }
-  };
-
-  // Start Scanner
-  const startScanner = async () => {
-    if (isScanning || !scannerRef.current) return; // Prevent multiple starts
-
-    setError('');
-    setSuccess('');
-    try {
-      await scannerRef.current.start(
-        { facingMode: "environment" }, // Use rear camera
-        { fps: 10, qrbox: { width: 250, height: 250 } }, // Settings
-        handleScanSuccess,
-        handleScanError
-      );
-      setIsScanning(true); // Set scanning state
-    } catch (err) {
-      console.error('Error starting scanner:', err);
-      setError('Could not start scanner. Please try again.');
-    }
-  };
-
-  // Stop Scanner
-  const stopScanner = async () => {
-    if (!isScanning || !scannerRef.current) return;
-  
-    try {
-      const state = scannerRef.current.getState(); // Check scanner state
-      if (state === 2) { // Only stop if scanner is RUNNING
-        await scannerRef.current.stop();
-        scannerRef.current.clear();
-        setIsScanning(false);
+      const data = await response.json();
+      if (response.ok) {
+        alert(data.message); // Display success message
+      } else {
+        alert(`Error: ${data.message}`); // Display error message from backend
       }
-    } catch (err) {
-      console.error("Error stopping scanner:", err);
-      setError("Could not stop scanner. Please try again.");
+    } catch (error) {
+      console.error('Error sending data to backend:', error);
     }
   };
-  
-
-  // Toggle Start/Stop Scanner
-  const handleStartStop = () => {
-    if (isScanning) {
-      stopScanner();
-    } else {
-      startScanner();
-    }
-  };
-
-  // Show loader while processing
-  if (loading) {
-    return <Loader />;
-  }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-2">
-        <QrCode className="h-6 w-6 text-[#01C38D]" />
-        <h1 className="text-2xl font-bold text-white">Check In by QR</h1>
-      </div>
-      <div className="border border-[#01C38D] rounded-lg p-4 sm:p-8 bg-[#132D46]">
-        <div id="reader" style={{ width: '100%' }} />
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={handleStartStop}
-            className={`px-4 py-2 rounded-md text-white font-medium transition-colors ${isScanning
-              ? 'bg-red-500 hover:bg-red-600'
-              : 'bg-[#01C38D] hover:bg-[#01C38D]/90'
-              }`}
-          >
-            {isScanning ? 'Stop Scanning' : 'Start Scanning'}
-          </button>
-        </div>
-      </div>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-      {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
+    <div>
+      <div id="reader" style={{ width: '100%' }}></div>
     </div>
   );
 };
 
-export default CheckInQR;
+export default QRScanner;
