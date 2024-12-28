@@ -34,8 +34,12 @@ const CheckInQR = () => {
       try {
         const response = await adminService.checkInByQR(decodedText);
         setSuccess(response.message || 'Participant checked in successfully!');
+        // Restart scanner after successful check-in
+        startScanner();
       } catch (error) {
         setError(error.message || 'Failed to check in participant');
+        // Restart scanner after failed check-in
+        startScanner();
       } finally {
         setLoading(false);
       }
@@ -45,6 +49,8 @@ const CheckInQR = () => {
   const handleScanError = (error) => {
     console.error('QR Code scan error:', error);
     setError('Error scanning QR code.');
+    // Restart the scanner after an error
+    startScanner();
   };
 
   const startScanner = async () => {
@@ -71,7 +77,7 @@ const CheckInQR = () => {
     if (isScanning && scannerRef.current) {
       try {
         await scannerRef.current.stop();
-        scannerRef.current.clear()
+        scannerRef.current.clear(); // Clear the scanner
         setIsScanning(false);
       } catch (err) {
         console.error("Error stopping scanner:", err);
@@ -104,8 +110,8 @@ const CheckInQR = () => {
           <button
             onClick={handleStartStop}
             className={`px-4 py-2 rounded-md text-white font-medium transition-colors ${isScanning
-                ? 'bg-red-500 hover:bg-red-600'
-                : 'bg-[#01C38D] hover:bg-[#01C38D]/90'
+              ? 'bg-red-500 hover:bg-red-600'
+              : 'bg-[#01C38D] hover:bg-[#01C38D]/90'
               }`}
           >
             {isScanning ? 'Stop Scanning' : 'Start Scanning'}
