@@ -37,6 +37,7 @@ const CheckInQR = () => {
     const handleScanSuccess = async (decodedText) => {
         console.log('Decoded text:', decodedText);
         setLoading(true)
+        setIsScanning(!isScanning)
         try {
             const response = await adminService.checkInByQR(decodedText);
             setSuccess(response.message)
