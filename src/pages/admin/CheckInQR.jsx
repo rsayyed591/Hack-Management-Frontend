@@ -36,34 +36,35 @@ const CheckInQR = () => {
 
     const handleScanSuccess = async (decodedText) => {
         console.log('Decoded text:', decodedText);
-        setLoading(true)
-        setIsScanning(!isScanning)
+        setLoading(true);
+        setSuccess(''); // Clear any previous success message
+        setError(''); // Clear any previous error message
+        setIsScanning(!isScanning);
+        
         try {
             const response = await adminService.checkInByQR(decodedText);
-            setSuccess(response.message)
-            setLoading(false)
+            setSuccess(response.message); // Show success message
         } catch (error) {
-            setError(error.message || 'Failed to check in participant')
-            setLoading(false)
+            setError(error.message || 'Failed to check in participant'); // Show error message
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     };
 
     const handleScanError = (error) => {
         console.error('QR Code scan error:', error);
-        setError('Error scanning QR code.')
+        setError('Error scanning QR code.');
     };
 
     const handleStartStop = () => {
-      setIsScanning(!isScanning)
-    }
+      setIsScanning(!isScanning);
+    };
 
     if (loading) {
         return <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
           <Loader />
         </div>
-      }
+    }
 
     return (
         <div className="space-y-6">
@@ -83,16 +84,11 @@ const CheckInQR = () => {
                   {isScanning ? 'Stop Scanning' : 'Start Scanning'}
                 </button>
               </div>
-              <div className="flex justify-center mt-2">
-                <button className="px-4 py-2 rounded-md text-[#191E29] bg-[#01C38D] hover:bg-[#01C38D]/90 transition-colors font-medium">
-                  Scan an Image File
-                </button>
-              </div>
             </div>
             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
             {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
         </div>
-    )
+    );
 };
 
 export default CheckInQR;
