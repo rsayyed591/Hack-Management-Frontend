@@ -81,7 +81,7 @@ export default function AdminDashboard() {
       </button>
 
       {/* Sidebar */}
-      <div className={`w-full lg:w-64 bg-[#132D46] border-b lg:border-b-0 lg:border-r border-[#01C38D]/20 ${mobileMenuOpen ? 'fixed inset-0 z-10' : 'hidden lg:block'}`}>
+      <div className={`w-full lg:w-64 bg-[#132D46] border-b lg:border-b-0 lg:border-r border-[#01C38D]/20 overflow-y-auto ${mobileMenuOpen ? 'fixed inset-0 z-10' : 'hidden lg:block'}`}>
         <div className="p-4">
           <h1 className="text-xl font-bold text-white mb-8 font-tt-commons">
             Admin Dashboard
@@ -106,7 +106,7 @@ export default function AdminDashboard() {
         </div>
         <button
           onClick={logout}
-          className="flex items-center space-x-3 px-4 py-2.5 text-white hover:bg-red-500/10 transition-colors lg:absolute lg:bottom-4 w-full lg:w-64"
+          className="flex items-center space-x-3 px-4 py-2.5 text-white hover:bg-red-500/10 transition-colors lg:bottom-4 w-full lg:w-56"
         >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Logout</span>
