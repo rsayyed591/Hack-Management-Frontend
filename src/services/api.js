@@ -75,7 +75,35 @@ export const participantService = {
     } catch (error) {
       throw error.response?.data || error
     }
-  }
+  },
+
+  viewPS: async () => {
+    try {
+      const response = await api.get('/user/viewPS')
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  // Add these new methods
+  // getCertificate: async () => {
+  //   try {
+  //     const response = await api.get('/user/getCertificate')
+  //     return response.data
+  //   } catch (error) {
+  //     throw error.response?.data || error
+  //   }
+  // },
+
+  // getPhotos: async () => {
+  //   try {
+  //     const response = await api.get('/user/getPhotos')
+  //     return response.data
+  //   } catch (error) {
+  //     throw error.response?.data || error
+  //   }
+  // }
 }
 
 export const superAdminService = {
@@ -281,16 +309,6 @@ export const adminService = {
     }
   },
 
-  // Bulk check in
-  bulkCheckIn: async (ids) => {
-    try {
-      const response = await api.post('/admin/bulkCheckIn', { ids })
-      return response.data
-    } catch (error) {
-      throw error.response?.data || error
-    }
-  },
-
   // Get checked in users
   getCheckedInUsers: async () => {
     try {
@@ -315,6 +333,35 @@ export const adminService = {
   addPS: async (psData) => {
     try {
       const response = await api.post('/admin/addPS', psData)
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  }
+}
+
+export const judgeService = {
+  getAssignedTeams: async () => {
+    try {
+      const response = await api.get('/judge/seeAssignedTeams')
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  fillMarks: async (marksData) => {
+    try {
+      const response = await api.post('/judge/fillMarks', marksData)
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  editMarks: async (marksData) => {
+    try {
+      const response = await api.put('/judge/editMarks', marksData)
       return response.data
     } catch (error) {
       throw error.response?.data || error

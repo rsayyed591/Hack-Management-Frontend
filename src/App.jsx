@@ -33,10 +33,15 @@ import AdminAddTeam from './pages/admin/AddTeam'
 import AdminParticipants from './pages/admin/Participants'
 import AdminTeams from './pages/admin/Teams'
 import AdminCheckIn from './pages/admin/CheckIn'
-import AdminCheckInQR from './pages/admin/CheckInQR'
 import AdminCheckedInUsers from './pages/admin/CheckedInUsers'
 import AdminAddPS from './pages/admin/AddPS'
 import AdminFoodQR from './pages/admin/FoodQR'
+
+// Add these imports at the top
+import Judge from './pages/judge/Judge'
+import AssignedTeams from './pages/judge/AssignedTeams'
+import GiveMarks from './pages/judge/GiveMarks'
+import EditMarks from './pages/judge/EditMarks'
 
 const SuperAdminRoute = ({ children }) => {
   const { user, loading } = useAuth()
@@ -60,6 +65,21 @@ const AdminRoute = ({ children }) => {
   }
 
   if (!user || user?.message?.role !== 'admin') {
+    return <Navigate to="/login" replace />
+  }
+  
+  return children
+}
+
+// Add this route guard component
+const JudgeRoute = ({ children }) => {
+  const { user, loading } = useAuth()
+  
+  if (loading) {
+    return <Loader />
+  }
+
+  if (!user || user?.message?.role !== 'judge') {
     return <Navigate to="/login" replace />
   }
   
@@ -159,11 +179,44 @@ export default function App() {
             <Route path="participants" element={<AdminParticipants />} />
             <Route path="teams" element={<AdminTeams />} />
             <Route path="check-in" element={<AdminCheckIn />} />
-            <Route path="check-in-qr" element={<AdminCheckInQR />} />
             <Route path="checked-in-users" element={<AdminCheckedInUsers />} />
             <Route path="add-ps" element={<AdminAddPS />} />
             <Route path="food-qr" element={<AdminFoodQR />} />
           </Route>
+
+          {/* Add these routes in your Routes component */}
+          <Route
+            path="/judge"
+            element={
+              <JudgeRoute>
+                <Judge />
+              </JudgeRoute>
+            }
+          />
+          <Route
+            path="/judge/assigned-teams"
+            element={
+              <JudgeRoute>
+                <AssignedTeams />
+              </JudgeRoute>
+            }
+          />
+          <Route
+            path="/judge/give-marks/:teamName/:teamId"
+            element={
+              <JudgeRoute>
+                <GiveMarks />
+              </JudgeRoute>
+            }
+          />
+          <Route
+            path="/judge/edit-marks/:teamName/:teamId"
+            element={
+              <JudgeRoute>
+                <EditMarks />
+              </JudgeRoute>
+            }
+          />
         </Routes>
       </AuthProvider>
     </Router>
