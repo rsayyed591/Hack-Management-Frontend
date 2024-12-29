@@ -60,7 +60,7 @@ export default function GiveMarks() {
       // Success message and navigation
       setSuccess('Marks submitted successfully')
       setTimeout(() => {
-        navigate('/judge/assigned-teams')
+        navigate('/judge')
       }, 2000)
     } catch (err) {
       setError(err.message || 'Failed to submit marks')

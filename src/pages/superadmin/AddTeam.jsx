@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Users } from 'lucide-react'
 import { superAdminService } from '../../services/api'
 import Loader from '../../components/Loader'
-import AutoComplete from '../../components/AutoComplete'
+import Autocomplete from '../../components/Autocomplete'
 
 export default function AddTeam() {
   const [formData, setFormData] = useState({
@@ -71,12 +71,13 @@ export default function AddTeam() {
         throw new Error('Team lead not found')
       }
 
-      const memberIds = validMembers.filter(id => id !== formData.teamLead)
+      // Include team lead in the members array if not already present
+      const memberIds = [...new Set([formData.teamLead, ...validMembers])]
 
       const teamData = {
         teamName: formData.teamName,
-        teamLead: formData.teamLead,
-        teamMembers: memberIds
+        teamLead: teamLeadParticipant.name, // Send team lead's name
+        teamMembers: memberIds // Send all member IDs including team lead
       }
 
       const response = await superAdminService.addTeam(teamData)
@@ -126,7 +127,7 @@ export default function AddTeam() {
     <label htmlFor="teamLead" className="block text-sm font-medium text-white">
       Team Lead <span className="text-red-500">*</span>
     </label>
-    <AutoComplete
+    <Autocomplete
       options={participants.map(p => ({ label: `${p.name} (${p.email})`, value: p._id }))}
       onSelect={(option) => setFormData({ ...formData, teamLead: option.value })}
       placeholder="Search for team lead"
@@ -137,7 +138,7 @@ export default function AddTeam() {
       <label htmlFor={`member${index + 1}`} className="block text-sm font-medium text-white">
         Team Member {index + 1}
       </label>
-      <AutoComplete
+      <Autocomplete
         options={participants.map(p => ({ label: `${p.name} (${p.email})`, value: p._id }))}
         onSelect={(option) => {
           const newMembers = [...formData.teamMembers]

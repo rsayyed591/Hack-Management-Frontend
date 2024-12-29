@@ -37,9 +37,8 @@ import AdminCheckedInUsers from './pages/admin/CheckedInUsers'
 import AdminAddPS from './pages/admin/AddPS'
 import AdminFoodQR from './pages/admin/FoodQR'
 
-// Add these imports at the top
+// Judge Routes
 import Judge from './pages/judge/Judge'
-import AssignedTeams from './pages/judge/AssignedTeams'
 import GiveMarks from './pages/judge/GiveMarks'
 import EditMarks from './pages/judge/EditMarks'
 
@@ -184,20 +183,12 @@ export default function App() {
             <Route path="food-qr" element={<AdminFoodQR />} />
           </Route>
 
-          {/* Add these routes in your Routes component */}
+          {/* Judge Routes */}
           <Route
             path="/judge"
             element={
               <JudgeRoute>
                 <Judge />
-              </JudgeRoute>
-            }
-          />
-          <Route
-            path="/judge/assigned-teams"
-            element={
-              <JudgeRoute>
-                <AssignedTeams />
               </JudgeRoute>
             }
           />
