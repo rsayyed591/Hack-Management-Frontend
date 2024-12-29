@@ -33,6 +33,7 @@ import AdminAddTeam from './pages/admin/AddTeam'
 import AdminParticipants from './pages/admin/Participants'
 import AdminTeams from './pages/admin/Teams'
 import AdminCheckIn from './pages/admin/CheckIn'
+import AdminCheckInQR from './pages/admin/CheckInQR'
 import AdminCheckedInUsers from './pages/admin/CheckedInUsers'
 import AdminAddPS from './pages/admin/AddPS'
 import AdminFoodQR from './pages/admin/FoodQR'
@@ -178,6 +179,7 @@ export default function App() {
             <Route path="participants" element={<AdminParticipants />} />
             <Route path="teams" element={<AdminTeams />} />
             <Route path="check-in" element={<AdminCheckIn />} />
+            <Route path="check-in-qr" element={<AdminCheckInQR />} />
             <Route path="checked-in-users" element={<AdminCheckedInUsers />} />
             <Route path="add-ps" element={<AdminAddPS />} />
             <Route path="food-qr" element={<AdminFoodQR />} />
