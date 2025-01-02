@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { LayoutDashboard, UserPlus, Users, Trophy, ClipboardList, UserCog, LogOut, Menu, X } from 'lucide-react'
 import { Link, useLocation, Outlet } from 'react-router-dom'
+import Loader from '../../components/Loader'
 
 export default function SuperAdminDashboard() {
-  const { user, logout } = useAuth()
+  const { user, logout, logoutLoading } = useAuth()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -40,7 +41,7 @@ export default function SuperAdminDashboard() {
       path: '/superadmin/assign-judges' 
     },
     { 
-      title: 'Judges', 
+      title: 'Assigned Judges', 
       icon: UserCog, 
       path: '/superadmin/assigned-judges' 
     },
@@ -53,6 +54,10 @@ export default function SuperAdminDashboard() {
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen)
+  }
+
+  if (logoutLoading) {
+    return <div className="flex items-center justify-center min-h-screen bg-[#191E29]"><Loader /></div>
   }
 
   return (
@@ -92,9 +97,10 @@ export default function SuperAdminDashboard() {
         <button
           onClick={logout}
           className="flex items-center space-x-3 px-4 py-2.5 text-white hover:bg-red-500/10 transition-colors lg:absolute lg:bottom-4 w-full lg:w-64"
+          disabled={logoutLoading}
         >
           <LogOut className="w-5 h-5" />
-          <span className="font-medium">Logout</span>
+          <span className="font-medium">{logoutLoading ? 'Logging out...' : 'Logout'}</span>
         </button>
       </div>
 

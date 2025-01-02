@@ -24,9 +24,15 @@ export default function AddPS() {
     setLoading(true)
 
     try {
-      await adminService.addPS(formData)
-      setSuccess('Problem statement added successfully')
-      setFormData({ title: '', description: '', domain: '' })
+      const response = await adminService.addPS(formData)
+      console.log(response);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        setSuccess('Problem statement added successfully')
+        setFormData({ title: '', description: '', domain: '' })
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to add ps');
+      }      
     } catch (err) {
       setError(err.message || 'Failed to add problem statement')
     } finally {

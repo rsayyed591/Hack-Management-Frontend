@@ -9,7 +9,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 export default function GiveMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
-  const { logout } = useAuth()
+  const { logout, logoutLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -70,7 +70,7 @@ export default function GiveMarks() {
   }
   
 
-  if (loading) {
+  if (loading || logoutLoading) {
     return <div className="flex items-center justify-center min-h-screen bg-[#191E29]">
       <Loader />
     </div>
@@ -83,8 +83,9 @@ export default function GiveMarks() {
         <button
           onClick={logout}
           className="text-white hover:text-[#01C38D] transition-colors"
+          disabled={logoutLoading}
         >
-          Logout
+          {logoutLoading ? 'Logging out...' : 'Logout'}
         </button>
       </div>
 

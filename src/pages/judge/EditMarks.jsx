@@ -9,7 +9,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 export default function EditMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
-  const { logout } = useAuth()
+  const { logout, logoutLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -53,17 +53,18 @@ export default function EditMarks() {
 
     try {
       const submissionData = {
-        ...formData,
+        teamName: teamId, // Send teamId as teamName in API
         innovation: parseFloat(formData.innovation),
         presentation: parseFloat(formData.presentation),
         feasibility: parseFloat(formData.feasibility),
         teamwork: parseFloat(formData.teamwork),
         prototype: parseFloat(formData.prototype),
+        feedback: formData.feedback.trim(),
       }
       await judgeService.editMarks(submissionData)
       setSuccess('Marks updated successfully')
       setTimeout(() => {
-        navigate('/judge/assigned-teams')
+        navigate('/judge')
       }, 2000)
     } catch (err) {
       setError(err.message || 'Failed to update marks')
@@ -72,7 +73,7 @@ export default function EditMarks() {
     }
   }
 
-  if (loading) {
+  if (loading || logoutLoading) {
     return <div className="flex items-center justify-center min-h-screen bg-[#191E29]">
       <Loader />
     </div>
@@ -85,8 +86,9 @@ export default function EditMarks() {
         <button
           onClick={logout}
           className="text-white hover:text-[#01C38D] transition-colors"
+          disabled={logoutLoading}
         >
-          Logout
+          {logoutLoading ? 'Logging out...' : 'Logout'}
         </button>
       </div>
 

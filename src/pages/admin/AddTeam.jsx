@@ -2,14 +2,15 @@ import { useState, useEffect } from 'react'
 import { Users } from 'lucide-react'
 import { adminService } from '../../services/api'
 import Loader from '../../components/Loader'
-import AutoComplete from '../../components/AutoComplete'
+import Autocomplete from '../../components/Autocomplete'
 
 export default function AddTeam() {
   const [formData, setFormData] = useState({
     teamName: '',
     teamLead: '',
-    teamMembers: ['', '', '', '', ''] // Allow up to 5 members
+    teamMembers: ['', '', '', ''] // 4 additional members (5 total including team lead)
   })
+  const [selectedMembers, setSelectedMembers] = useState([])
   const [participants, setParticipants] = useState([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -35,8 +36,20 @@ export default function AddTeam() {
     if (e.target.name === 'teamName') {
       setFormData({ ...formData, teamName: e.target.value })
     } else if (e.target.name === 'teamLead') {
-      setFormData({ ...formData, teamLead: e.target.value })
+      const teamLead = e.target.value
+      setFormData(prev => ({
+        ...prev,
+        teamLead
+      }))
+      setSelectedMembers([teamLead])
     }
+  }
+
+  const handleMemberSelect = (option, index) => {
+    const newMembers = [...formData.teamMembers]
+    newMembers[index] = option.value
+    setFormData({ ...formData, teamMembers: newMembers })
+    setSelectedMembers(prev => [...new Set([...prev, option.value])])
   }
 
   const handleSubmit = async (e) => {
@@ -57,9 +70,9 @@ export default function AddTeam() {
       return
     }
 
-    const validMembers = formData.teamMembers.filter(member => member.trim() !== '')
+    const validMembers = [formData.teamLead, ...formData.teamMembers.filter(member => member.trim() !== '')]
     if (validMembers.length < 1) {
-      setError('At least one team member is required')
+      setError('At least one team member (the team lead) is required')
       setIsSubmitting(false)
       return
     }
@@ -70,13 +83,10 @@ export default function AddTeam() {
         throw new Error('Team lead not found')
       }
 
-      // Include team lead in the members array if not already present
-      const memberIds = [...new Set([formData.teamLead, ...validMembers])]
-
       const teamData = {
         teamName: formData.teamName,
-        teamLead: teamLeadParticipant.name, // Send team lead's name
-        teamMembers: memberIds // Send all member IDs including team lead
+        teamLead: teamLeadParticipant.name,
+        teamMembers: validMembers
       }
 
       const response = await adminService.addTeam(teamData)
@@ -84,8 +94,9 @@ export default function AddTeam() {
       setFormData({
         teamName: '',
         teamLead: '',
-        teamMembers: ['', '', '', '', '']
+        teamMembers: ['', '', '', '']
       })
+      setSelectedMembers([])
     } catch (err) {
       console.error('Error adding team:', err)
       setError(err.message || 'Failed to add team. Please try again.')
@@ -124,27 +135,25 @@ export default function AddTeam() {
         </div>
         <div>
           <label htmlFor="teamLead" className="block text-sm font-medium text-white">
-            Team Lead <span className="text-red-500">*</span>
+            Team Lead (Member 1) <span className="text-red-500">*</span>
           </label>
-          <AutoComplete
+          <Autocomplete
             options={participants.map(p => ({ label: `${p.name} (${p.email})`, value: p._id }))}
-            onSelect={(option) => setFormData({ ...formData, teamLead: option.value })}
+            onSelect={(option) => handleChange({ target: { name: 'teamLead', value: option.value } })}
             placeholder="Search for team lead"
           />
         </div>
         {formData.teamMembers.map((member, index) => (
           <div key={index}>
-            <label htmlFor={`member${index + 1}`} className="block text-sm font-medium text-white">
-              Team Member {index + 1}
+            <label htmlFor={`member${index + 2}`} className="block text-sm font-medium text-white">
+              Team Member {index + 2}
             </label>
-            <AutoComplete
-              options={participants.map(p => ({ label: `${p.name} (${p.email})`, value: p._id }))}
-              onSelect={(option) => {
-                const newMembers = [...formData.teamMembers]
-                newMembers[index] = option.value
-                setFormData({ ...formData, teamMembers: newMembers })
-              }}
-              placeholder={`Search for team member ${index + 1}`}
+            <Autocomplete
+              options={participants
+                .filter(p => !selectedMembers.includes(p._id) || p._id === member)
+                .map(p => ({ label: `${p.name} (${p.email})`, value: p._id }))}
+              onSelect={(option) => handleMemberSelect(option, index)}
+              placeholder={`Search for team member ${index + 2}`}
             />
           </div>
         ))}

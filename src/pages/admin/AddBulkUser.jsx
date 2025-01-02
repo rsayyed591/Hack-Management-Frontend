@@ -30,8 +30,14 @@ export default function AddBulkUser() {
 
     try {
       const response = await adminService.bulkAddUser(formData);
-      setSuccess(response.message || 'Users added successfully.');
-      setFile(null); // Reset the file input
+      console.log(response);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        setSuccess(response.message || 'Users added successfully.');
+        setFile(null);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to add ps');
+      }      
     } catch (err) {
       setError(err.message || 'Failed to add users.');
     } finally {

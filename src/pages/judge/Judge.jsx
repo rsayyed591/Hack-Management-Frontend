@@ -7,7 +7,7 @@ import Loader from '../../components/Loader'
 import { useNavigate } from 'react-router-dom'
 
 export default function Judge() {
-  const { user, logout, loading: authLoading } = useAuth()
+  const { user, logout, loading: authLoading, logoutLoading } = useAuth()
   const [teams, setTeams] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -28,7 +28,7 @@ export default function Judge() {
     fetchTeams()
   }, [])
 
-  if (authLoading || loading) {
+  if (authLoading || loading || logoutLoading) {
     return <div className="flex items-center justify-center min-h-screen bg-[#191E29]">
       <Loader />
     </div>
@@ -45,8 +45,9 @@ export default function Judge() {
         <button
           onClick={logout}
           className="text-white hover:text-[#01C38D] transition-colors"
+          disabled={logoutLoading}
         >
-          Logout
+          {logoutLoading ? 'Logging out...' : 'Logout'}
         </button>
       </div>
       <div className="max-w-6xl mx-auto space-y-8 sm:space-y-12">

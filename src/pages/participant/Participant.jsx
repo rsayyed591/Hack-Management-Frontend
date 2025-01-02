@@ -5,10 +5,10 @@ import { useAuth } from '../../contexts/AuthContext'
 import Loader from '../../components/Loader'
 
 export default function Participant() {
-  const { user, logout, loading } = useAuth()
+  const { user, logout, loading, logoutLoading } = useAuth()
 
-  if (loading) {
-    return <Loader /> 
+  if (loading || logoutLoading) {
+    return <div className="flex items-center justify-center min-h-screen bg-[#191E29]"><Loader /></div>
   }
 
   if (!user) {
@@ -30,8 +30,9 @@ export default function Participant() {
         <button
           onClick={logout}
           className="text-white hover:text-[#01C38D] transition-colors"
+          disabled={logoutLoading}
         >
-          Logout
+          {logoutLoading ? 'Logging out...' : 'Logout'}
         </button>
       </div>
       <div className="max-w-6xl mx-auto space-y-8 sm:space-y-12">
@@ -59,3 +60,4 @@ export default function Participant() {
     </div>
   )
 }
+

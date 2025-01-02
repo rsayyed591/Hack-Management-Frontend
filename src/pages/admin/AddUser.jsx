@@ -24,9 +24,15 @@ export default function AddUser() {
     setSuccess('')
     setLoading(true)
     try {
-      await adminService.addUser(formData)
-      setSuccess('User added successfully')
-      setFormData({ name: '', email: '', password: '', role: 'participant' })
+      const response = await adminService.addUser(formData)
+      console.log(response);
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        setSuccess('User added successfully')
+        setFormData({ name: '', email: '', password: '', role: 'participant' })
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || 'Failed to add user');
+      }
     } catch (err) {
       setError(err.message || 'Failed to add user')
     } finally {

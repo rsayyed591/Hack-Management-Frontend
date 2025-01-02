@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { LayoutDashboard, UserPlus, Users, ClipboardList, QrCode, FileText, Utensils, Upload, LogOut, Menu, X } from 'lucide-react'
 import { Link, useLocation, Outlet } from 'react-router-dom'
+import Loader from '../../components/Loader'
 
 export default function AdminDashboard() {
-  const { user, logout } = useAuth()
+  const { user, logout, logoutLoading } = useAuth()
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -70,6 +71,10 @@ export default function AdminDashboard() {
     setMobileMenuOpen(!mobileMenuOpen)
   }
 
+  if (logoutLoading) {
+    return <div className="flex items-center justify-center min-h-screen bg-[#191E29]"><Loader /></div>
+  }
+
   return (
     <div className="min-h-screen h-screen flex flex-col lg:flex-row bg-[#191E29]">
       {/* Mobile Menu Button */}
@@ -106,10 +111,11 @@ export default function AdminDashboard() {
         </div>
         <button
           onClick={logout}
-          className="flex items-center space-x-3 px-4 py-2.5 text-white hover:bg-red-500/10 transition-colors lg:bottom-4 w-full lg:w-56"
+          className="flex items-center space-x-3 px-4 py-2.5 text-white hover:bg-red-500/10 transition-colors lg:absolute lg:bottom-4 w-full lg:w-64"
+          disabled={logoutLoading}
         >
           <LogOut className="w-5 h-5" />
-          <span className="font-medium">Logout</span>
+          <span className="font-medium">{logoutLoading ? 'Logging out...' : 'Logout'}</span>
         </button>
       </div>
 
@@ -129,3 +135,4 @@ export default function AdminDashboard() {
     </div>
   )
 }
+

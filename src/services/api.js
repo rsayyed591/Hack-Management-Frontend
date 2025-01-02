@@ -165,7 +165,6 @@ export const superAdminService = {
       throw error.response?.data || error
     }
   },
-
   // Assign teams to judges
   assignTeamsJudge: async (assignmentData) => {
     try {
@@ -282,7 +281,6 @@ export const adminService = {
   getParticipants: async () => {
     try {
       const response = await api.get('/admin/getParticipants')
-      console.log(response.data)
       return response.data
     } catch (error) {
       throw error.response?.data || error
