@@ -16,21 +16,18 @@ export default function GiveMarks() {
 
   const [formData, setFormData] = useState({
     teamId: teamId,
-    innovation: '',
-    presentation: '',
-    feasibility: '',
-    teamwork: '',
-    prototype: '',
+    innovation: 5,
+    presentation: 5,
+    feasibility: 5,
+    teamwork: 5,
+    prototype: 5,
     feedback: ''
   })
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    // For numerical fields, ensure the value is between 0 and 10
     if (['innovation', 'presentation', 'feasibility', 'teamwork', 'prototype'].includes(name)) {
-      const numValue = parseFloat(value)
-      if (isNaN(numValue) || numValue < 0 || numValue > 10) return
-      setFormData(prev => ({ ...prev, [name]: numValue }))
+      setFormData(prev => ({ ...prev, [name]: parseFloat(value) }))
     } else {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
@@ -43,21 +40,19 @@ export default function GiveMarks() {
     setSuccess('')
   
     try {
-      // Prepare the submission data as per the required format
       const submissionData = {
-        teamName: teamId, // Send teamId as teamName in API
-        innovation: parseFloat(formData.innovation),
-        presentation: parseFloat(formData.presentation),
-        feasibility: parseFloat(formData.feasibility),
-        teamwork: parseFloat(formData.teamwork),
-        prototype: parseFloat(formData.prototype),
+        teamName: teamId,
+        innovation: formData.innovation,
+        presentation: formData.presentation,
+        feasibility: formData.feasibility,
+        teamwork: formData.teamwork,
+        prototype: formData.prototype,
         feedback: formData.feedback.trim(),
       }
   
       console.log('Submitting data:', submissionData)
       await judgeService.fillMarks(submissionData)
   
-      // Success message and navigation
       setSuccess('Marks submitted successfully')
       setTimeout(() => {
         navigate('/judge')
@@ -69,7 +64,6 @@ export default function GiveMarks() {
     }
   }
   
-
   if (loading || logoutLoading) {
     return <div className="flex items-center justify-center min-h-screen bg-[#191E29]">
       <Loader />
@@ -102,18 +96,18 @@ export default function GiveMarks() {
             {['innovation', 'presentation', 'feasibility', 'teamwork', 'prototype'].map((field) => (
               <div key={field}>
                 <label className="block text-sm font-medium text-white capitalize mb-2">
-                  {field} (0-10)
+                  {field} ({formData[field]})
                 </label>
                 <input
-                  type="number"
+                  type="range"
                   name={field}
                   value={formData[field]}
                   onChange={handleChange}
-                  step="0.5"
                   min="0"
                   max="10"
+                  step="0.5"
                   required
-                  className="w-full px-3 py-2 bg-[#191E29] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#01C38D] border border-[#01C38D]"
+                  className="w-full h-2 bg-[#191E29] rounded-lg appearance-none cursor-pointer accent-[#01C38D]"
                 />
               </div>
             ))}
