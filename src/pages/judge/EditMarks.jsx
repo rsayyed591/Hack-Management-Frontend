@@ -47,7 +47,10 @@ export default function EditMarks() {
   const handleChange = (e) => {
     const { name, value } = e.target
     if (['innovation', 'presentation', 'feasibility', 'teamwork', 'prototype'].includes(name)) {
-      setFormData(prev => ({ ...prev, [name]: parseFloat(value) }))
+      const intValue = Math.round(parseFloat(value))
+      if (!isNaN(intValue) && intValue >= 0 && intValue <= 10) {
+        setFormData(prev => ({ ...prev, [name]: intValue }))
+      }
     } else {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
@@ -111,21 +114,36 @@ export default function EditMarks() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {['innovation', 'presentation', 'feasibility', 'teamwork', 'prototype'].map((field) => (
-              <div key={field}>
-                <label className="block text-sm font-medium text-white capitalize mb-2">
-                  {field} ({formData[field]})
+              <div key={field} className="space-y-2">
+                <label className="block text-sm font-medium text-white capitalize">
+                  {field}
                 </label>
-                <input
-                  type="range"
-                  name={field}
-                  value={formData[field]}
-                  onChange={handleChange}
-                  min="0"
-                  max="10"
-                  step="0.5"
-                  required
-                  className="w-full h-2 bg-[#191E29] rounded-lg appearance-none cursor-pointer accent-[#01C38D]"
-                />
+                <div className="flex items-center space-x-4">
+                <span className="w-12 px-2 py-1 bg-[#132D46] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#01C38D] border border-[#01C38D]">
+                    {formData[field]}
+                  </span>
+                  <div className="flex-grow relative">
+                    <input
+                      type="range"
+                      name={field}
+                      value={formData[field]}
+                      onChange={handleChange}
+                      min="0"
+                      max="10"
+                      step="1"
+                      required
+                      className="w-full appearance-none bg-[#01C38D] h-1 rounded outline-none opacity-70 transition-opacity duration-200 ease-in-out hover:opacity-100 focus:opacity-100"
+                      style={{
+                        background: `linear-gradient(to right, #01C38D 0%, #01C38D ${formData[field] * 10}%, #191E29 ${formData[field] * 10}%, #191E29 100%)`
+                      }}
+                    />
+                    <div className="absolute top-5 left-0 w-full flex justify-between">
+                      {[0, 2, 4, 6, 8, 10].map(num => (
+                        <span key={num} className="text-xs text-white" style={{ transform: 'translateX(-50%)' }}>{num}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
 
