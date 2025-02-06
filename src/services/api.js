@@ -113,7 +113,7 @@ export const superAdminService = {
       const [teamsResponse, participantsResponse, leaderboardResponse] = await Promise.all([
         api.get('/superAdmin/getTeams'),
         api.get('/superAdmin/getParticipants'),
-        api.get('/superAdmin/leaderBoard')
+        api.get('/superAdmin/leaderboard')
       ])
 
       return {

@@ -17,15 +17,19 @@ export default function Dashboard() {
       setLoading(true)
       try {
         const data = await superAdminService.getDashboardStats()
+        console.log(data.topTeams)
+  
+        const formattedTopTeams = data.topTeams.map(team => ({
+          id: team._id,
+          name: team._id, // Team name
+          score: team.grandTotal, // Total score
+          judge: [...new Set(team.rounds.flatMap(round => round.judges))].join(", ") // Combine unique judges
+        }))
+  
         setStats({
           totalParticipants: data.totalParticipants,
           totalTeams: data.totalTeams,
-          topTeams: data.topTeams.map(team => ({
-            id: team._id,
-            name: team.teamName,
-            score: team.total,
-            judge: team.judgeName
-          }))
+          topTeams: formattedTopTeams
         })
       } catch (err) {
         setError(err.message || 'Failed to fetch dashboard stats')
@@ -33,9 +37,9 @@ export default function Dashboard() {
         setLoading(false)
       }
     }
-
     fetchDashboardStats()
   }, [])
+  
 
   if (loading) {
         return <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
@@ -93,7 +97,7 @@ export default function Dashboard() {
                 <tr className="text-left border-b border-[#01C38D]/20">
                   <th className="pb-3 px-4 sm:px-6 text-xs sm:text-sm font-medium text-[#696E79]">Rank</th>
                   <th className="pb-3 px-4 sm:px-6 text-xs sm:text-sm font-medium text-[#696E79]">Team Name</th>
-                  <th className="pb-3 px-4 sm:px-6 text-xs sm:text-sm font-medium text-[#696E79]">Score</th>
+                  <th className="pb-3 px-4 sm:px-6 text-xs sm:text-sm font-medium text-[#696E79]">Grand Total</th>
                   <th className="pb-3 px-4 sm:px-6 text-xs sm:text-sm font-medium text-[#696E79]">Judge</th>
                 </tr>
               </thead>
@@ -101,7 +105,7 @@ export default function Dashboard() {
                 {stats.topTeams.map((team, index) => (
                   <tr key={team.id} className="border-b border-[#01C38D]/10">
                     <td className="py-3 px-4 sm:px-6 text-sm">{index + 1}</td>
-                    <td className="py-3 px-4 sm:px-6 text-sm">{team.name}</td>
+                    <td className="py-3 px-4 sm:px-6 text-sm">{team.id}</td>
                     <td className="py-3 px-4 sm:px-6 text-sm">{team.score}</td>
                     <td className="py-3 px-4 sm:px-6 text-sm">{team.judge}</td>
                   </tr>

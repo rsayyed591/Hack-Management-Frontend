@@ -1,30 +1,34 @@
-import { useState, useEffect } from 'react'
-import { UserCog } from 'lucide-react'
-import { superAdminService } from '../../services/api'
-import Loader from '../../components/Loader'
-import AutoComplete from '../../components/AutoComplete'
+"use client"
+
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { superAdminService } from "../../services/api"
+import { useAuth } from "../../contexts/AuthContext"
+import Loader from "../../components/Loader"
+import { toast } from "react-hot-toast"
 
 export default function AssignJudges() {
   const [judges, setJudges] = useState([])
   const [teams, setTeams] = useState([])
-  const [selectedJudge, setSelectedJudge] = useState('')
-  const [selectedTeams, setSelectedTeams] = useState([])
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(true)
+  const [selectedJudge, setSelectedJudge] = useState("")
+  const [selectedTeams, setSelectedTeams] = useState([])
+  const [selectedRound, setSelectedRound] = useState("round 1")
+  const { logout } = useAuth()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true)
       try {
-        const [judgesData, teamsData] = await Promise.all([
+        const [judgesResponse, teamsResponse] = await Promise.all([
           superAdminService.getJudges(),
-          superAdminService.getTeams()
+          superAdminService.getTeams(),
         ])
-        setJudges(judgesData.data)
-        setTeams(teamsData.data)
-      } catch (err) {
-        setError('Failed to fetch data')
+        setJudges(judgesResponse.data)
+        setTeams(teamsResponse.data)
+      } catch (error) {
+        console.error("Error fetching data:", error)
+        toast.error("Failed to fetch judges and teams")
       } finally {
         setLoading(false)
       }
@@ -32,93 +36,106 @@ export default function AssignJudges() {
     fetchData()
   }, [])
 
-  const handleJudgeSelect = (option) => {
-    setSelectedJudge(option.value)
+  const handleTeamSelection = (teamId) => {
+    setSelectedTeams((prevSelected) =>
+      prevSelected.includes(teamId)
+        ? prevSelected.filter((id) => id !== teamId) // Remove if already selected
+        : [...prevSelected, teamId] // Add if not selected
+    )
   }
 
-  const handleTeamSelect = (option) => {
-    setSelectedTeams(prev => {
-      if (prev.some(team => team.value === option.value)) {
-        return prev.filter(team => team.value !== option.value)
-      } else {
-        return [...prev, option]
-      }
-    })
-  }
-
-  const handleSubmit = async (e) => {
+  const handleAssign = async (e) => {
     e.preventDefault()
-    setError('')
-    setSuccess('')
+    if (!selectedJudge || selectedTeams.length === 0 || !selectedRound) {
+      toast.error("Please select a judge, at least one team, and a round")
+      return
+    }
+
     try {
-      await Promise.all(selectedTeams.map(team => 
-        superAdminService.assignTeamsJudge({ judgeId: selectedJudge, teamId: team.value })
-      ))
-      setSuccess('Teams assigned successfully')
-      setSelectedJudge('')
+      setLoading(true)
+      await superAdminService.assignTeamsJudge({
+        judgeId: selectedJudge,
+        teamId: selectedTeams,
+        round: selectedRound,
+      })
+      toast.success("Teams assigned successfully")
+      // Reset form
+      setSelectedJudge("")
       setSelectedTeams([])
-    } catch (err) {
-      setError(err.message || 'Failed to assign teams')
+      setSelectedRound("round 1")
+    } catch (error) {
+      console.error("Error assigning teams:", error)
+      toast.error("Failed to assign teams")
+    } finally {
+      setLoading(false)
     }
   }
 
   if (loading) {
-    return <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
-      <Loader />
-    </div>
+    return <Loader />
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-2">
-        <UserCog className="h-6 w-6 text-[#01C38D]" />
-        <h1 className="text-2xl font-bold text-white">Assign Judges</h1>
-      </div>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen bg-[#191E29] text-white p-8">
+      <h1 className="text-3xl font-bold mb-8">Assign Judges to Teams</h1>
+      <form onSubmit={handleAssign} className="space-y-6">
+        {/* Select Judge */}
         <div>
-          <label htmlFor="judge" className="block text-sm font-medium text-white">Select Judge</label>
-          <AutoComplete
-            options={judges.map(judge => ({ label: `${judge.name} (${judge.email})`, value: judge._id }))}
-            onSelect={handleJudgeSelect}
-            placeholder="Search for a judge"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-white">Select Teams</label>
-          <AutoComplete
-            options={teams.map(team => ({ label: team.teamName, value: team._id }))}
-            onSelect={handleTeamSelect}
-            placeholder="Search for teams"
-          />
-        </div>
-        <div className="mt-2">
-          <h3 className="text-sm font-medium text-white mb-2">Selected Teams:</h3>
-          <ul className="space-y-1">
-            {selectedTeams.map(team => (
-              <li key={team.value} className="flex items-center">
-                <span className="text-white">{team.label}</span>
-                <button
-                  type="button"
-                  onClick={() => handleTeamSelect(team)}
-                  className="ml-2 text-red-500 hover:text-red-700"
-                >
-                  Remove
-                </button>
-              </li>
+          <label className="block mb-2">Select Judge:</label>
+          <select
+            value={selectedJudge}
+            onChange={(e) => setSelectedJudge(e.target.value)}
+            className="w-full p-2 bg-[#132D46] rounded"
+          >
+            <option value="">Select a judge</option>
+            {judges.map((judge) => (
+              <option key={judge._id} value={judge._id}>
+                {judge.name}
+              </option>
             ))}
-          </ul>
+          </select>
         </div>
+
+        {/* Select Teams (Checkbox List) */}
+        <div>
+          <label className="block mb-2">Select Teams:</label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 bg-[#132D46] p-3 rounded">
+            {teams.map((team) => (
+              <label key={team._id} className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedTeams.includes(team._id)}
+                  onChange={() => handleTeamSelection(team._id)}
+                  className="accent-[#01C38D]"
+                />
+                <span>{team.teamName}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Select Round */}
+        <div>
+          <label className="block mb-2">Select Round:</label>
+          <select
+            value={selectedRound}
+            onChange={(e) => setSelectedRound(e.target.value)}
+            className="w-full p-2 bg-[#132D46] rounded"
+          >
+            <option value="round 1">Round 1</option>
+            <option value="round 2">Round 2</option>
+            <option value="final">Final</option>
+          </select>
+        </div>
+
+        {/* Submit Button */}
         <button
           type="submit"
-          disabled={!selectedJudge || selectedTeams.length === 0}
-          className="w-full sm:w-auto flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-[#191E29] bg-[#01C38D] hover:bg-[#01C38D]/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#01C38D] disabled:opacity-50"
+          className="bg-[#01C38D] text-[#191E29] px-4 py-2 rounded hover:bg-[#01C38D]/90 transition"
         >
           Assign Teams
         </button>
       </form>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-      {success && <p className="mt-2 text-sm text-green-600">{success}</p>}
     </div>
   )
 }
-

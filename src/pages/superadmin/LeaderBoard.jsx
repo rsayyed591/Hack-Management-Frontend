@@ -1,78 +1,63 @@
-import { useState, useEffect } from 'react'
-import { Trophy } from 'lucide-react'
-import { superAdminService } from '../../services/api'
-import Loader from '../../components/Loader'
+import { useState, useEffect } from "react"
+import { superAdminService } from "../../services/api"
+import Loader from "../../components/Loader"
+import { toast } from "react-hot-toast"
 
-export default function LeaderBoard() {
-  const [leaderboard, setLeaderboard] = useState([])
-  const [error, setError] = useState('')
+export default function Leaderboard() {
+  const [leaderboardData, setLeaderboardData] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
-      setLoading(true)
       try {
         const response = await superAdminService.getLeaderboard()
-        setLeaderboard(response.data)
-      } catch (err) {
-        setError('Failed to fetch leaderboard')
-      }
-      finally {
+        setLeaderboardData(response.data)
+      } catch (error) {
+        console.error("Error fetching leaderboard:", error)
+        toast.error("Failed to fetch leaderboard data")
+      } finally {
         setLoading(false)
       }
     }
+
     fetchLeaderboard()
   }, [])
 
   if (loading) {
-    return <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
-    <Loader />
-  </div>
+    return <Loader />
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-2">
-        <Trophy className="h-6 w-6 text-[#01C38D]" />
-        <h1 className="text-2xl font-bold text-white">Leaderboard</h1>
-      </div>
-      {error ? (
-        <p className="text-red-600">{error}</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-[#01C38D]">
-            <thead className="bg-[#132D46]">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Rank</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Team Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Innovation</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Presentation</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Feasibility</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Teamwork</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Prototype</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Total Score</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">Judge</th>
+    <div className="min-h-screen bg-[#191E29] text-white p-8">
+      <h1 className="text-3xl font-bold mb-8">Leaderboard</h1>
+      <div className="w-full max-w-4xl overflow-x-auto">
+        <table className="w-full bg-[#132D46] rounded-lg overflow-hidden border border-[#01C38D]/50 shadow-lg">
+          <thead className="bg-[#01C38D] text-[#191E29]">
+            <tr>
+              <th className="p-4 text-left border-r border-[#191E29]/20">Rank</th>
+              <th className="p-4 text-left border-r border-[#191E29]/20">Team</th>
+              <th className="p-4 text-left border-r border-[#191E29]/20">Round 1</th>
+              <th className="p-4 text-left border-r border-[#191E29]/20">Round 2</th>
+              <th className="p-4 text-left border-r border-[#191E29]/20">Final</th>
+              <th className="p-4 text-left">Grand Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {leaderboardData.map((team, index) => (
+              <tr key={team._id} className={`border-b border-[#01C38D]/20 ${index % 2 === 0 ? 'bg-[#1E354E]' : 'bg-[#162C44]'} hover:bg-[#254060] transition-all`}> 
+                <td className="p-4 border-r border-[#01C38D]/20">{index + 1}</td>
+                <td className="p-4 border-r border-[#01C38D]/20 font-semibold">{team._id}</td>
+                {["round 1", "round 2", "final"].map((round) => (
+                  <td key={round} className="p-4 border-r border-[#01C38D]/20 text-center">
+                    {team.rounds.find((r) => r.round === round)?.score || "-"}
+                  </td>
+                ))}
+                <td className="p-4 font-bold text-[#01C38D] text-center">{team.grandTotal}</td>
               </tr>
-            </thead>
-            <tbody className="bg-[#191E29] divide-y divide-[#01C38D]">
-              {leaderboard.map((team, index) => (
-                <tr key={team.teamName}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{index + 1}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{team.teamName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{team.criteria.innovation}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{team.criteria.presentation}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{team.criteria.feasibility}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{team.criteria.teamwork}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{team.criteria.proto}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{team.total}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{team.judgeName}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   )
 }
-
