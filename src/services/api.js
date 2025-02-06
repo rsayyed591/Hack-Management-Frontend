@@ -178,7 +178,7 @@ export const superAdminService = {
   // Get leaderboard
   getLeaderboard: async () => {
     try {
-      const response = await api.get('/superAdmin/leaderBoard')
+      const response = await api.get('/superAdmin/leaderboard')
       return response.data
     } catch (error) {
       throw error.response?.data || error
@@ -339,9 +339,9 @@ export const adminService = {
 }
 
 export const judgeService = {
-  getAssignedTeams: async () => {
+  getAssignedTeams: async (round) => {
     try {
-      const response = await api.get('/judge/seeAssignedTeams')
+      const response = await api.get(`/judge/seeAssignedTeams/${round}`)
       return response.data
     } catch (error) {
       throw error.response?.data || error
