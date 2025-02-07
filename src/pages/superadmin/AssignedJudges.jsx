@@ -1,29 +1,28 @@
-import { useState, useEffect } from 'react'
-import { UserCog } from 'lucide-react'
-import { superAdminService } from '../../services/api'
-import Loader from '../../components/Loader'
-import { Combobox } from '@headlessui/react'
+"use client"
+
+import { useState, useEffect, useRef } from "react"
+import { superAdminService } from "../../services/api"
+import Loader from "../../components/Loader"
+import { toast } from "react-hot-toast"
+import { User, Users } from "lucide-react"
 
 export default function AssignedJudges() {
   const [assignedJudges, setAssignedJudges] = useState([])
-  const [selectedJudge, setSelectedJudge] = useState('')
-  const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const cardsRef = useRef([])
 
   useEffect(() => {
     const fetchAssignedJudges = async () => {
       try {
         const response = await superAdminService.getAssignedJudges()
-
-        // Sort data alphabetically by judge name (A to Z)
-        const sortedJudges = response.data.sort((a, b) =>
-          a.judge.name.localeCompare(b.judge.name)
-        )
-
-        setAssignedJudges(sortedJudges)
-      } catch (err) {
-        setError('Failed to fetch assigned judges')
+        if (response.statusCode === 200) {
+          setAssignedJudges(response.data)
+        } else {
+          throw new Error(response.message || "Failed to fetch assigned judges")
+        }
+      } catch (error) {
+        console.error("Error fetching assigned judges:", error)
+        toast.error("Failed to fetch assigned judges")
       } finally {
         setLoading(false)
       }
@@ -32,98 +31,47 @@ export default function AssignedJudges() {
     fetchAssignedJudges()
   }, [])
 
-  const filteredJudges =
-    query === ''
-      ? assignedJudges
-      : assignedJudges.filter((assignment) =>
-          assignment.judge.name.toLowerCase().includes(query.toLowerCase()) ||
-          assignment.judge.email.toLowerCase().includes(query.toLowerCase())
-        )
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center lg:h-[70vh] bg-[#191E29]">
-        <Loader />
-      </div>
-    )
-  }
-
-  if (error) {
-    return <p className="text-red-600">{error}</p>
+    return <Loader />
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-2">
-        <UserCog className="h-6 w-6 text-[#01C38D]" />
-        <h1 className="text-2xl font-bold text-white">Assigned Judges</h1>
-      </div>
-
-      {/* Combobox Search Functionality */}
-      <Combobox value={selectedJudge} onChange={setSelectedJudge}>
-        <div className="relative w-full">
-          <Combobox.Input
-            className="w-full px-4 py-2 border border-[#01C38D] bg-[#191E29] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#01C38D]"
-            placeholder="Search judges..."
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <Combobox.Options className="absolute mt-2 w-full bg-[#132D46] border border-[#01C38D] rounded-md shadow-lg max-h-60 overflow-auto z-50">
-            {filteredJudges.length === 0 && query !== '' ? (
-              <div className="p-2 text-white">No judges found.</div>
-            ) : (
-              filteredJudges.map((assignment) => (
-                <Combobox.Option
-                  key={assignment._id}
-                  value={assignment}
-                  className={({ active }) =>
-                    `p-2 cursor-pointer ${active ? 'bg-[#01C38D] text-[#191E29]' : 'text-white'}`
-                  }
-                >
-                  {assignment.judge.name} ({assignment.judge.email})
-                </Combobox.Option>
-              ))
-            )}
-          </Combobox.Options>
+    <div className="min-h-screen bg-[#191E29] text-white p-8">
+      <h1 className="text-3xl font-bold mb-8 flex items-center">
+        <Users className="mr-4 h-8 w-8 text-[#01C38D]" />
+        Assigned Judges
+      </h1>
+      {assignedJudges.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {assignedJudges.map((judge, index) => (
+            <div
+              key={judge._id}
+              ref={(el) => (cardsRef.current[index] = el)}
+              className="bg-[#132D46] rounded-lg p-6 shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            >
+              <h2 className="text-2xl font-semibold mb-4 flex items-center">
+                <User className="mr-2 h-6 w-6 text-[#01C38D]" />
+                {judge.judgeName}
+              </h2>
+              <h3 className="text-xl font-medium mb-2">Assigned Teams:</h3>
+              <ul className="space-y-2">
+                {judge.teamAssigned.map((team, index) => (
+                  <li key={index} className="flex items-center">
+                    <span className="w-2 h-2 bg-[#01C38D] rounded-full mr-2"></span>
+                    <span>
+                      {team.teamName} - {team.round}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
-      </Combobox>
-
-      {/* Displaying Assigned Judges Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-[#01C38D]">
-          <thead className="bg-[#132D46]">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">
-                Judge
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">
-                Assigned Teams
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-[#01C38D] uppercase tracking-wider">
-                Edited By
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-[#191E29] divide-y divide-[#01C38D]">
-            {filteredJudges.map((assignment) => (
-              <tr key={assignment._id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                  {assignment.judge.name} ({assignment.judge.email})
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                  <ul>
-                    {assignment.teamAssgined.map((team) => (
-                      <li key={team._id}>{team.teamName}</li>
-                    ))}
-                  </ul>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
-                  {assignment.editedBy.name} ({assignment.editedBy.email})
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      ) : (
+        <p className="text-center text-xl">No judges have been assigned teams yet.</p>
+      )}
     </div>
   )
 }
+
