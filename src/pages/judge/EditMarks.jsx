@@ -1,29 +1,33 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { Edit3 } from "lucide-react"
 import { useAuth } from "../../contexts/AuthContext"
 import { judgeService } from "../../services/api"
 import GoBackButton from "../../components/GoBackButton"
 import Loader from "../../components/Loader"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useLocation } from "react-router-dom"
 import JoditEditor from "jodit-react"
 
 export default function EditMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
+  const round = location.state?.round || "round 1"
   const { logout, logoutLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
   const [formData, setFormData] = useState({
-    teamId: teamId,
+    teamName: teamId,
     innovation: 5,
     presentation: 5,
     feasibility: 5,
     teamwork: 5,
     prototype: 5,
     feedback: "",
-    round: 1, // Added round to formData
+    round: round,
   })
 
   useEffect(() => {
@@ -32,10 +36,13 @@ export default function EditMarks() {
       try {
         const response = await judgeService.getMarks(teamId)
         if (response.statusCode === 200 && response.data) {
+          const roundData = response.data.criteria.find((c) => c.round === round) || {}
           setFormData((prev) => ({
             ...prev,
-            ...response.data,
-            teamId: teamId,
+            ...roundData,
+            teamName: teamId,
+            feedback: response.data.feedback.find((f) => f.round === round)?.text || "",
+            round: round,
           }))
         } else {
           throw new Error("Failed to fetch marks")
@@ -48,7 +55,7 @@ export default function EditMarks() {
     }
 
     fetchMarks()
-  }, [teamId])
+  }, [teamId, round])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -57,8 +64,6 @@ export default function EditMarks() {
       if (!isNaN(intValue) && intValue >= 0 && intValue <= 10) {
         setFormData((prev) => ({ ...prev, [name]: intValue }))
       }
-    } else if (name === "round") {
-      setFormData((prev) => ({ ...prev, [name]: Number.parseInt(value) }))
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }))
     }
@@ -78,21 +83,15 @@ export default function EditMarks() {
     setSuccess("")
 
     try {
-      const submissionData = {
-        teamName: teamId,
-        innovation: formData.innovation,
-        presentation: formData.presentation,
-        feasibility: formData.feasibility,
-        teamwork: formData.teamwork,
-        prototype: formData.prototype,
-        feedback: formData.feedback.trim(),
-        round: formData.round, // Added round to submissionData
+      const response = await judgeService.editMarks(formData)
+      if (response.statusCode === 200) {
+        setSuccess("Marks updated successfully")
+        setTimeout(() => {
+          navigate("/judge")
+        }, 2000)
+      } else {
+        throw new Error(response.message || "Failed to update marks")
       }
-      await judgeService.editMarks(submissionData)
-      setSuccess("Marks updated successfully")
-      setTimeout(() => {
-        navigate("/judge")
-      }, 2000)
     } catch (err) {
       setError(err.message || "Failed to update marks")
     } finally {
@@ -127,19 +126,6 @@ export default function EditMarks() {
           <h2 className="text-xl font-bold text-white mb-6">Team: {teamName}</h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">Round</label>
-              <select
-                name="round"
-                value={formData.round}
-                onChange={handleChange}
-                className="w-full py-2 px-4 bg-[#132D46] text-white border border-[#01C38D] rounded-md focus:outline-none focus:ring-2 focus:ring-[#01C38D]"
-              >
-                <option value={1}>1</option>
-                <option value={2}>2</option>
-                {/* Add more rounds as needed */}
-              </select>
-            </div>
             {["innovation", "presentation", "feasibility", "teamwork", "prototype"].map((field) => (
               <div key={field} className="space-y-2">
                 <label className="block text-sm font-medium text-white capitalize">{field}</label>
@@ -275,7 +261,7 @@ export default function EditMarks() {
                       "#BF9000",
                       "#38761D",
                       "#134F5C",
-                      "#1C4587",
+                      "#1155CC",
                       "#073763",
                       "#20124D",
                       "#4C1130",
@@ -285,7 +271,7 @@ export default function EditMarks() {
                       "#7F6000",
                       "#274E13",
                       "#0C343D",
-                      "#1155CC",
+                      "#1C4587",
                       "#073763",
                       "#20124D",
                       "#4C1130",

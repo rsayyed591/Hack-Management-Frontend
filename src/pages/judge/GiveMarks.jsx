@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import { PenSquare } from "lucide-react"
 import { useAuth } from "../../contexts/AuthContext"
@@ -10,20 +12,21 @@ import JoditEditor from "jodit-react"
 export default function GiveMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
+  const round = "round 2"
   const { logout, logoutLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
 
   const [formData, setFormData] = useState({
-    teamId: teamId,
-    innovation: 5,
-    presentation: 5,
-    feasibility: 5,
-    teamwork: 5,
-    prototype: 5,
-    feedback: "",
-    round: "round 1",
+    teamName:teamId,
+    innovation:5,
+    presentation:5,
+    feasibility:5,
+    teamwork:5,
+    prototype:5,
+    feedback:"",
+    round:round,
   })
 
   const handleChange = (e) => {
@@ -47,26 +50,18 @@ export default function GiveMarks() {
     setLoading(true)
     setError("")
     setSuccess("")
+    console.log(formData)
 
     try {
-      const submissionData = {
-        teamName: teamId,
-        innovation: formData.innovation,
-        presentation: formData.presentation,
-        feasibility: formData.feasibility,
-        teamwork: formData.teamwork,
-        prototype: formData.prototype,
-        feedback: formData.feedback.trim(),
-        round: formData.round,
+      const response = await judgeService.fillMarks(formData)
+      if (response.statusCode === 201) {
+        setSuccess("Marks submitted successfully")
+        setTimeout(() => {
+          navigate("/judge")
+        }, 2000)
+      } else {
+        throw new Error(response.message || "Failed to submit marks")
       }
-
-      console.log("Submitting data:", submissionData)
-      await judgeService.fillMarks(submissionData)
-
-      setSuccess("Marks submitted successfully")
-      setTimeout(() => {
-        navigate("/judge")
-      }, 2000)
     } catch (err) {
       setError(err.message || "Failed to submit marks")
     } finally {
@@ -264,19 +259,6 @@ export default function GiveMarks() {
                 }}
                 onBlur={handleFeedbackChange}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">Round</label>
-              <select
-                name="round"
-                value={formData.round}
-                onChange={handleChange}
-                className="w-full px-3 py-2 bg-[#191E29] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-[#01C38D] border border-[#01C38D]"
-              >
-                <option value="round 1">Round 1</option>
-                <option value="round 2">Round 2</option>
-                <option value="final">Final</option>
-              </select>
             </div>
 
             <button
