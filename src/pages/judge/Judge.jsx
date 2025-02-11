@@ -14,12 +14,14 @@ export default function Judge() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const cardsRef = useRef([])
-  const round = "round 2"
+  const round = "1"
+
+  
   useEffect(() => {
     const fetchTeams = async () => {
       setLoading(true)
       try {
-        const response = await judgeService.getAssignedTeams(`${round}`)
+        const response = await judgeService.getAssignedTeams(`round ${round}`)
         if (response.statusCode === 200) {
           setTeams(response.data.length > 0 ? response.data[0].teamAssgined : [])
         } else {
@@ -63,7 +65,7 @@ export default function Judge() {
           Logout
         </button>
       </div>
-      <h2 className="text-2xl font-semibold mb-6">Assigned Teams - Round 1</h2>
+      <h2 className="text-2xl font-semibold mb-6">Assigned Teams - Round {round}</h2>
       {teams.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {teams.map((team, index) => (
@@ -76,7 +78,7 @@ export default function Judge() {
               <div className="flex flex-col space-y-4">
                 <button
                   onClick={() =>
-                    navigate(`/judge/give-marks/${team.teamName}/${team.teamId}`, { state: { round: "round 1" } })
+                    navigate(`/judge/give-marks/${team.teamName}/${team.teamId}`, { state: { round: `round ${round}` } })
                   }
                   className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#01C38D] text-[#191E29] rounded-md hover:bg-[#01C38D]/90 transition-colors"
                 >
@@ -85,7 +87,7 @@ export default function Judge() {
                 </button>
                 <button
                   onClick={() =>
-                    navigate(`/judge/edit-marks/${team.teamName}/${team.teamId}`, { state: { round: "round 1" } })
+                    navigate(`/judge/edit-marks/${team.teamName}/${team.teamId}`, { state: { round: `round ${round}` } })
                   }
                   className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#132D46] text-white border-2 border-[#01C38D] rounded-md hover:bg-[#132D46]/80 transition-colors"
                 >

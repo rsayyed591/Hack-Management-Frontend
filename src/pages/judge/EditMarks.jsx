@@ -6,14 +6,14 @@ import { useAuth } from "../../contexts/AuthContext"
 import { judgeService } from "../../services/api"
 import GoBackButton from "../../components/GoBackButton"
 import Loader from "../../components/Loader"
-import { useParams, useNavigate, useLocation } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import JoditEditor from "jodit-react"
 
 export default function EditMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
-  const location = useLocation()
-  const round = location.state?.round || "round 1"
+  const round = "1"
+  const roundname = "round 1"
   const { logout, logoutLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -27,36 +27,52 @@ export default function EditMarks() {
     teamwork: 5,
     prototype: 5,
     feedback: "",
-    round: round,
+    round: roundname,
   })
 
   useEffect(() => {
     const fetchMarks = async () => {
       setLoading(true)
       try {
-        const response = await judgeService.getMarks(teamId)
-        if (response.statusCode === 200 && response.data) {
-          const roundData = response.data.criteria.find((c) => c.round === round) || {}
-          setFormData((prev) => ({
-            ...prev,
-            ...roundData,
-            teamName: teamId,
-            feedback: response.data.feedback.find((f) => f.round === round)?.text || "",
-            round: round,
-          }))
-        } else {
-          throw new Error("Failed to fetch marks")
+        const response = await judgeService.viewPreviousMarks(teamId)
+        console.log("API Response:", response) // 🔍 Debugging Log
+  
+        if (!response || !response.data || !Array.isArray(response.data)) {
+          throw new Error("No valid data received from the API")
         }
+  
+        // Find the marks for "round 1"
+        console.log(round)
+        const roundData = response.data.find((entry) => entry.round === round)
+        console.log("Round Data:", roundData) // 🔍 Debugging Log
+        if (!roundData) {
+          throw new Error("No marks found for this round")
+        }
+  
+        // Use default values only if they are missing
+        setFormData((prev) => ({
+          ...prev,
+          innovation: roundData.criteria?.innovation ?? 5,
+          presentation: roundData.criteria?.presentation ?? 5,
+          feasibility: roundData.criteria?.feasibility ?? 5,
+          teamwork: roundData.criteria?.teamwork ?? 5,
+          prototype: roundData.criteria?.proto ?? 5, // ✅ Fix: Map `proto` → `prototype`
+          feedback: roundData.feedback ?? "",
+          teamName: teamId,
+          round: roundname,
+        }))
+        console.log(formData)
       } catch (err) {
+        console.error("Error fetching marks:", err) // 🔍 Debugging Log
         setError("Failed to fetch existing marks: " + (err.message || "Unknown error"))
       } finally {
         setLoading(false)
       }
     }
-
+  
     fetchMarks()
   }, [teamId, round])
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target
     if (["innovation", "presentation", "feasibility", "teamwork", "prototype"].includes(name)) {
@@ -81,9 +97,13 @@ export default function EditMarks() {
     setLoading(true)
     setError("")
     setSuccess("")
-
+  
     try {
-      const response = await judgeService.editMarks(formData)
+      console.log("Submitting Data:", formData) // 🔍 Debugging Log
+  
+      const response = await judgeService.editMarks(teamId, formData)
+      console.log("API Response:", response) // 🔍 Debugging Log
+  
       if (response.statusCode === 200) {
         setSuccess("Marks updated successfully")
         setTimeout(() => {
@@ -93,11 +113,13 @@ export default function EditMarks() {
         throw new Error(response.message || "Failed to update marks")
       }
     } catch (err) {
+      console.error("Error updating marks:", err.response?.data || err) // 🔍 Debugging Log
       setError(err.message || "Failed to update marks")
     } finally {
       setLoading(false)
     }
   }
+  
 
   if (loading || logoutLoading) {
     return (

@@ -12,7 +12,7 @@ import JoditEditor from "jodit-react"
 export default function GiveMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
-  const round = "round 2"
+  const round = "round 1"
   const { logout, logoutLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -54,6 +54,7 @@ export default function GiveMarks() {
 
     try {
       const response = await judgeService.fillMarks(formData)
+      console.log("resp", response)
       if (response.statusCode === 201) {
         setSuccess("Marks submitted successfully")
         setTimeout(() => {

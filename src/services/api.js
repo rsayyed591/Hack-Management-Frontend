@@ -351,6 +351,7 @@ export const judgeService = {
   fillMarks: async (marksData) => {
     try {
       const response = await api.post('/judge/fillMarks', marksData)
+      console.log("res",response,marksData)
       return response.data
     } catch (error) {
       throw error.response?.data || error
@@ -360,6 +361,15 @@ export const judgeService = {
   editMarks: async (marksData) => {
     try {
       const response = await api.put('/judge/editMarks', marksData)
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
+  viewPreviousMarks: async (teamName) => {
+    try {
+      const response = await api.get(`/judge/viewPreviousMarks/${teamName}`)
       return response.data
     } catch (error) {
       throw error.response?.data || error
