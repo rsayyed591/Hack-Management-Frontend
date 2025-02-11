@@ -101,7 +101,7 @@ export default function EditMarks() {
     try {
       console.log("Submitting Data:", formData) // 🔍 Debugging Log
   
-      const response = await judgeService.editMarks(teamId, formData)
+      const response = await judgeService.editMarks(formData)
       console.log("API Response:", response) // 🔍 Debugging Log
   
       if (response.statusCode === 200) {
