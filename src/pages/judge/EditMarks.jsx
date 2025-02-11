@@ -43,7 +43,7 @@ export default function EditMarks() {
   
         // Find the marks for "round 1"
         console.log(round)
-        const roundData = response.data.find((entry) => entry.round === round)
+        const roundData = response.data.find((entry) => entry.round === roundname)
         console.log("Round Data:", roundData) // 🔍 Debugging Log
         if (!roundData) {
           throw new Error("No marks found for this round")
