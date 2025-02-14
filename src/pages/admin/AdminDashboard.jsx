@@ -20,11 +20,11 @@ export default function AdminDashboard() {
       icon: UserPlus, 
       path: '/admin/add-user' 
     },
-    { 
+    /*{ 
       title: 'Bulk Add User', 
       icon: Upload, 
       path: '/admin/bulk-add-user' 
-    },
+    },*/
     { 
       title: 'Add Team', 
       icon: Users, 
@@ -55,7 +55,7 @@ export default function AdminDashboard() {
       icon: ClipboardList, 
       path: '/admin/checked-in-users' 
     },
-    { 
+    /*{ 
       title: 'Add PS', 
       icon: FileText, 
       path: '/admin/add-ps' 
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
       title: 'Food QR', 
       icon: Utensils, 
       path: '/admin/food-qr' 
-    }
+    }*/
   ]
 
   const toggleMobileMenu = () => {
