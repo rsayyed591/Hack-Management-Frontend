@@ -20,18 +20,18 @@ export default function GiveMarks() {
 
   const [formData, setFormData] = useState({
     teamName:teamId,
-    innovation:5,
-    presentation:5,
-    feasibility:5,
-    teamwork:5,
-    prototype:5,
+    approach:5,
+    ambition:5,
+    tech:5,
+    execution:5,
+    ui:5,
     feedback:"",
     round:round,
   })
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    if (["innovation", "presentation", "feasibility", "teamwork", "prototype"].includes(name)) {
+    if (["approach", "ambition", "tech", "execution", "ui"].includes(name)) {
       const intValue = Math.round(Number.parseFloat(value))
       if (!isNaN(intValue) && intValue >= 0 && intValue <= 10) {
         setFormData((prev) => ({ ...prev, [name]: intValue }))
@@ -97,7 +97,7 @@ export default function GiveMarks() {
           <h2 className="text-xl font-bold text-white mb-6">Team: {teamName}</h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {["innovation", "presentation", "feasibility", "teamwork", "prototype"].map((field) => (
+            {["approach", "ambition", "tech", "execution", "ui"].map((field) => (
               <div key={field} className="space-y-2">
                 <label className="block text-sm font-medium text-white capitalize">{field}</label>
                 <div className="flex items-center space-x-4">

@@ -21,11 +21,11 @@ export default function EditMarks() {
 
   const [formData, setFormData] = useState({
     teamName: teamId,
-    innovation: 5,
-    presentation: 5,
-    feasibility: 5,
-    teamwork: 5,
-    prototype: 5,
+    approach: 5,
+    ambition: 5,
+    tech: 5,
+    execution: 5,
+    ui: 5,
     feedback: "",
     round: roundname,
   })
@@ -52,11 +52,11 @@ export default function EditMarks() {
         // Use default values only if they are missing
         setFormData((prev) => ({
           ...prev,
-          innovation: roundData.criteria?.innovation ?? 5,
-          presentation: roundData.criteria?.presentation ?? 5,
-          feasibility: roundData.criteria?.feasibility ?? 5,
-          teamwork: roundData.criteria?.teamwork ?? 5,
-          prototype: roundData.criteria?.proto ?? 5, // ✅ Fix: Map `proto` → `prototype`
+          approach: roundData.criteria?.approach ?? 5,
+          ambition: roundData.criteria?.ambition ?? 5,
+          tech: roundData.criteria?.tech ?? 5,
+          execution: roundData.criteria?.execution ?? 5,
+          ui: roundData.criteria?.proto ?? 5, // ✅ Fix: Map `proto` → `ui`
           feedback: roundData.feedback ?? "",
           teamName: teamId,
           round: roundname,
@@ -75,7 +75,7 @@ export default function EditMarks() {
   
   const handleChange = (e) => {
     const { name, value } = e.target
-    if (["innovation", "presentation", "feasibility", "teamwork", "prototype"].includes(name)) {
+    if (["approach", "ambition", "tech", "execution", "ui"].includes(name)) {
       const intValue = Math.round(Number.parseFloat(value))
       if (!isNaN(intValue) && intValue >= 0 && intValue <= 10) {
         setFormData((prev) => ({ ...prev, [name]: intValue }))
@@ -145,7 +145,7 @@ export default function EditMarks() {
           <h2 className="text-xl font-bold text-white mb-6">Team: {teamName}</h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {["innovation", "presentation", "feasibility", "teamwork", "prototype"].map((field) => (
+            {["approach", "ambition", "tech", "execution", "ui"].map((field) => (
               <div key={field} className="space-y-2">
                 <label className="block text-sm font-medium text-white capitalize">{field}</label>
                 <div className="flex items-center space-x-4">

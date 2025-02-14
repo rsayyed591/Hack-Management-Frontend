@@ -56,7 +56,7 @@ export default function Judge() {
   return (
     <div className="min-h-screen bg-[#191E29] text-white p-8">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Welcome, {user?.name || "Judge"}</h1>
+        <h1 className="text-3xl font-bold">Welcome, {user?.message?.name}</h1>
         <button
           onClick={handleLogout}
           className="flex items-center px-4 py-2 bg-[#01C38D] text-[#191E29] rounded-md hover:bg-[#01C38D]/90 transition-colors"
