@@ -76,7 +76,7 @@ export default function CheckIn() {
                 <ProfileItem label="Name" value={user?.message?.name} />
                 <ProfileItem label="Email" value={user?.message?.email} />
                 <ProfileItem label="Role" value={user?.message?.role} />
-                <ProfileItem label="Workplace" value={user?.message?.food?.work} />
+                <ProfileItem label="Workplace" value={user?.message?.workplace} />
               </div>
             </div>
           </div>

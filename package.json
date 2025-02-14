@@ -12,6 +12,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "axios": "^1.7.9",
+    "framer-motion": "^12.4.2",
     "html5-qrcode": "^2.3.8",
     "jodit-react": "^5.2.4",
     "lucide-react": "^0.469.0",

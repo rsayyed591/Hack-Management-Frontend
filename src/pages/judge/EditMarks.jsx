@@ -85,11 +85,8 @@ export default function EditMarks() {
     }
   }
 
-  const handleFeedbackChange = (newFeedback) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      feedback: newFeedback,
-    }))
+  const handleFeedbackChange = (newContent) => {
+    setFormData((prev) => ({ ...prev, feedback: newContent }))
   }
 
   const handleSubmit = async (e) => {
@@ -181,13 +178,13 @@ export default function EditMarks() {
             ))}
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">Feedback</label>
+            <label className="block text-sm font-medium text-white mb-2">Feedback</label>
               <JoditEditor
                 value={formData.feedback}
-                onChange={handleFeedbackChange}
                 config={{
-                  theme: "dark",
+                  readonly: false,
                   height: 300,
+                  theme: "dark",
                   placeholder: "Enter your feedback here...",
                   buttons: [
                     "bold",
@@ -283,7 +280,7 @@ export default function EditMarks() {
                       "#BF9000",
                       "#38761D",
                       "#134F5C",
-                      "#1155CC",
+                      "#1C4587",
                       "#073763",
                       "#20124D",
                       "#4C1130",
@@ -307,6 +304,7 @@ export default function EditMarks() {
                     color: "#ffffff",
                   },
                 }}
+                onBlur={handleFeedbackChange}
               />
             </div>
 

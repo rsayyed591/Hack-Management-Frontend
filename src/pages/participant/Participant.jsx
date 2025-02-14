@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { QrCode, Utensils, FileText, Award, Image } from 'lucide-react'
+import { QrCode, FileText, Award, Image } from 'lucide-react'
 import GoBackButton from '../../components/GoBackButton'
 import { useAuth } from '../../contexts/AuthContext'
 import Loader from '../../components/Loader'
@@ -17,7 +17,6 @@ export default function Participant() {
 
   const sections = [
     { name: 'Check-in', icon: QrCode, path: '/participant/check-in' },
-    { name: 'Food', icon: Utensils, path: '/participant/food' },
     { name: 'Problem Statement', icon: FileText, path: '/participant/problem-statement' },
     { name: 'Certificate', icon: Award, path: '/participant/certificate' },
     { name: 'Photos', icon: Image, path: '/participant/photos' },
