@@ -55,6 +55,11 @@ export default function AdminDashboard() {
       icon: ClipboardList, 
       path: '/admin/checked-in-users' 
     },
+    { 
+      title: 'Not Check In Users', 
+      icon: ClipboardList, 
+      path: '/admin/not-checked-in-users' 
+    },
     /*{ 
       title: 'Add PS', 
       icon: FileText, 

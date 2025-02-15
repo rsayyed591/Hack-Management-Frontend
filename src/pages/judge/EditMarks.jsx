@@ -56,7 +56,7 @@ export default function EditMarks() {
           ambition: roundData.criteria?.ambition ?? 5,
           tech: roundData.criteria?.tech ?? 5,
           execution: roundData.criteria?.execution ?? 5,
-          ui: roundData.criteria?.proto ?? 5, // ✅ Fix: Map `proto` → `ui`
+          ui: roundData.criteria?.ui ?? 5, // ✅ Fix: Map `proto` → `ui`
           feedback: roundData.feedback ?? "",
           teamName: teamId,
           round: roundname,

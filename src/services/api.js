@@ -317,6 +317,17 @@ export const adminService = {
     }
   },
 
+  // Get not checked in users
+  getNotCheckedInUsers: async () => {
+    try {
+      const response = await api.get('/admin/notCheckIn')
+      console.log(response.data)
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
+
   // Food QR
   foodQR: async (qrData) => {
     try {

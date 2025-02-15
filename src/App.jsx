@@ -37,6 +37,7 @@ import AdminCheckInQR from './pages/admin/CheckInQR'
 import AdminCheckedInUsers from './pages/admin/CheckedInUsers'
 import AdminAddPS from './pages/admin/AddPS'
 import AdminFoodQR from './pages/admin/FoodQR'
+import AdminNotCheckedInUsers from './pages/admin/NotCheckedInUsers'
 
 // Judge Routes
 import Judge from './pages/judge/Judge'
@@ -181,6 +182,7 @@ export default function App() {
             <Route path="check-in" element={<AdminCheckIn />} />
             <Route path="check-in-qr" element={<AdminCheckInQR />} />
             <Route path="checked-in-users" element={<AdminCheckedInUsers />} />
+            <Route path="not-checked-in-users" element={<AdminNotCheckedInUsers />} />
             <Route path="add-ps" element={<AdminAddPS />} />
             <Route path="food-qr" element={<AdminFoodQR />} />
           </Route>
