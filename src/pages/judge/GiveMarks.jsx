@@ -12,7 +12,7 @@ import JoditEditor from "jodit-react"
 export default function GiveMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
-  const round = "round 2"
+  const round = "final"
   const { logout, logoutLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")

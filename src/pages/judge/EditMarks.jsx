@@ -12,8 +12,7 @@ import JoditEditor from "jodit-react"
 export default function EditMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
-  const round = "2"
-  const roundname = "round 2"
+  const roundname = "final"
   const { logout, logoutLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -42,7 +41,6 @@ export default function EditMarks() {
         }
   
         // Find the marks for "round 1"
-        console.log(round)
         const roundData = response.data.find((entry) => entry.round === roundname)
         console.log("Round Data:", roundData) // 🔍 Debugging Log
         if (!roundData) {
@@ -64,14 +62,14 @@ export default function EditMarks() {
         console.log(formData)
       } catch (err) {
         console.error("Error fetching marks:", err) // 🔍 Debugging Log
-        setError("Failed to fetch existing marks: " + (err.message || "Unknown error"))
+        // setError("Failed to fetch existing marks: " + (err.message || "Unknown error"))
       } finally {
         setLoading(false)
       }
     }
   
     fetchMarks()
-  }, [teamId, round])
+  }, [teamId, roundname])
   
   const handleChange = (e) => {
     const { name, value } = e.target

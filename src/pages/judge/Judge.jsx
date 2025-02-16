@@ -17,7 +17,7 @@ export default function Judge() {
     const fetchTeams = async () => {
       setLoading(true)
       try {
-        const response = await judgeService.getAssignedTeams("round 2")
+        const response = await judgeService.getAssignedTeams("final")
         if (response.statusCode === 200) {
           setTeams(response.data.length > 0 ? response.data[0].teamAssgined : [])
         } else {
@@ -61,7 +61,7 @@ export default function Judge() {
           Logout
         </button>
       </div>
-      <h2 className="text-2xl font-semibold mb-6">Assigned Teams - Round 2</h2>
+      <h2 className="text-2xl font-semibold mb-6">Assigned Teams - Final Round</h2>
       {teams.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {teams.map((team, index) => (
@@ -90,13 +90,13 @@ export default function Judge() {
                   <Edit3 className="h-4 w-4" />
                   <span>Edit Marks</span>
                 </button>
-                <button
+                {/* <button
                   onClick={() => navigate(`/judge/view-previous-feedback/${team.teamName}/${team.teamId}`)}
                   className="flex items-center justify-center space-x-2 px-4 py-2 bg-[#132D46] text-white border-2 border-[#01C38D] rounded-md hover:bg-[#132D46]/80 transition-colors"
                 >
                   <Eye className="h-4 w-4" />
                   <span>View Previous Feedback</span>
-                </button>
+                </button> */}
               </div>
             </div>
           ))}
