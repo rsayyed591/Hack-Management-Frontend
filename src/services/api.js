@@ -377,7 +377,14 @@ export const judgeService = {
       throw error.response?.data || error
     }
   },
-
+  viewPreviousRoundFeedback: async (teamId, round) => {
+    try {
+      const response = await api.get(`/judge/viewPreviousRoundFeedback/${teamId}/${round}`)
+      return response.data
+    } catch (error) {
+      throw error.response?.data || error
+    }
+  },
   viewPreviousMarks: async (teamName) => {
     try {
       const response = await api.get(`/judge/viewPreviousMarks/${teamName}`)

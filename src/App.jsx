@@ -43,6 +43,7 @@ import AdminNotCheckedInUsers from './pages/admin/NotCheckedInUsers'
 import Judge from './pages/judge/Judge'
 import GiveMarks from './pages/judge/GiveMarks'
 import EditMarks from './pages/judge/EditMarks'
+import ViewPreviousFeedback from './pages/judge/ViewPreviousFeedback'
 
 const SuperAdminRoute = ({ children }) => {
   const { user, loading } = useAuth()
@@ -196,6 +197,7 @@ export default function App() {
               </JudgeRoute>
             }
           />
+          <Route path="/judge/view-previous-feedback/:teamName/:teamId" element={<ViewPreviousFeedback />} />
           <Route
             path="/judge/give-marks/:teamName/:teamId"
             element={
