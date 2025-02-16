@@ -12,8 +12,8 @@ import JoditEditor from "jodit-react"
 export default function EditMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
-  const round = "1"
-  const roundname = "round 1"
+  const round = "2"
+  const roundname = "round 2"
   const { logout, logoutLoading } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")

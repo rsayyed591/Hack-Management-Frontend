@@ -17,7 +17,7 @@ export default function Judge() {
     const fetchTeams = async () => {
       setLoading(true)
       try {
-        const response = await judgeService.getAssignedTeams("round 1")
+        const response = await judgeService.getAssignedTeams("round 2")
         if (response.statusCode === 200) {
           setTeams(response.data.length > 0 ? response.data[0].teamAssgined : [])
         } else {
@@ -61,7 +61,7 @@ export default function Judge() {
           Logout
         </button>
       </div>
-      <h2 className="text-2xl font-semibold mb-6">Assigned Teams - Round 1</h2>
+      <h2 className="text-2xl font-semibold mb-6">Assigned Teams - Round 2</h2>
       {teams.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {teams.map((team, index) => (
@@ -102,7 +102,7 @@ export default function Judge() {
           ))}
         </div>
       ) : (
-        <p className="text-center text-xl">No teams assigned for round 1.</p>
+        <p className="text-center text-xl">No teams assigned for round 2.</p>
       )}
     </div>
   )
