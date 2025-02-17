@@ -8,7 +8,7 @@ import GoBackButton from "../../components/GoBackButton"
 import Loader from "../../components/Loader"
 import { useParams, useNavigate } from "react-router-dom"
 import JoditEditor from "jodit-react"
-
+//hi this is the edit marks
 export default function EditMarks() {
   const { teamName, teamId } = useParams()
   const navigate = useNavigate()
