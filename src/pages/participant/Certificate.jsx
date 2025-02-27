@@ -17,19 +17,17 @@ export default function Certificate() {
         </button>
       </div>
       <div className="max-w-4xl mx-auto border-2 border-[#01C38D] rounded-lg p-4 sm:p-8 bg-[#132D46]">
-        <h1 className="text-4xl font-bold text-white mb-8 flex items-center font-tt-commons">
-          <Award className="mr-4 h-10 w-10 text-[#01C38D]" />
-          Certificate
-        </h1>
-        <div className="bg-[#191E29] p-4 sm:p-8 rounded-lg text-center border-2 border-[#01C38D]">
-          <p className="text-[#696E79] mb-6">
-            Your certificate of participation will be available here after the hackathon concludes and the admin uploads it.
-          </p>
-          <button className="bg-[#01C38D] hover:bg-[#01C38D]/90 text-[#191E29] font-bold py-3 px-6 rounded disabled:opacity-50 disabled:cursor-not-allowed transition-colors" disabled>
-            Download Certificate
-          </button>
-        </div>
-      </div>
+  <h1 className="text-4xl font-bold text-white mb-8 flex items-center font-tt-commons">
+    <Award className="mr-4 h-10 w-10 text-[#01C38D]" />
+    Certificate
+  </h1>
+  <div className="bg-[#191E29] p-4 sm:p-8 rounded-lg text-center border-2 border-[#01C38D]">
+    <p className="text-[#696E79] mb-6">
+      We sincerely apologize for the delay in processing your certificate. Please note that your certificate of participation will be sent directly to your registered email address. It will not be available for download here in the coming days. We appreciate your patience and understanding.
+    </p>
+  </div>
+</div>
+
     </div>
   )
 }
