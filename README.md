@@ -167,11 +167,11 @@ This project is distributed under the **MIT License**. See the `LICENSE` file fo
 
 ## Acknowledgements
 
-- [React](https://reactjs.org/)
-- [Node.js](https://nodejs.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Vercel](https://vercel.com/)
-- [GitHub](https://github.com/)
+- [React](https://reactjs.org)
+- [Node.js](https://nodejs.org)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Vercel](https://vercel.com)
+- [GitHub](https://github.com)
 
 Special thanks to **Rehan Shah** for developing the backend. Visit his GitHub profile: [rehannn03](https://github.com/rehannn03).
 
